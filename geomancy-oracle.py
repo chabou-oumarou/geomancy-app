@@ -22,36 +22,18 @@ GEOMANTIC_DATA = {
 
 UI_TEXT = {
     "EN": {
-        "title": "Celestial Oracle 2026",
-        "subtitle": "Modern Science of the Sands",
-        "btn": "Cast the Shield",
-        "mother_tab": "Mother",
-        "row": "Row",
-        "foundation": "I. The Foundation (Mothers & Daughters)",
-        "nephews": "II. The Nephews",
-        "court": "III. The Verdict",
-        "witness_r": "Right Witness",
-        "witness_l": "Left Witness",
-        "judge": "The Judge",
-        "reconciler": "The Reconciler",
-        "element": "Element",
-        "error": "Incomplete! Fill all fields.",
+        "title": "Celestial Oracle", "subtitle": "Modern Geomancy Portal", "btn": "Cast the Shield",
+        "mother_tab": "Mother", "row": "Row", "foundation": "I. The Foundation",
+        "nephews": "II. The Nephews", "court": "III. The Verdict",
+        "witness_r": "Right Witness", "witness_l": "Left Witness", "judge": "The Judge",
+        "reconciler": "The Reconciler", "element": "Element", "error": "Fill all fields."
     },
     "FR": {
-        "title": "Oracle Céleste 2026",
-        "subtitle": "Science Moderne des Sables",
-        "btn": "Générer le Blason",
-        "mother_tab": "Mère",
-        "row": "Ligne",
-        "foundation": "I. La Fondation (Mères & Filles)",
-        "nephews": "II. Les Neveux",
-        "court": "III. Le Verdict",
-        "witness_r": "Témoin Droit",
-        "witness_l": "Témoin Gauche",
-        "judge": "Le Juge",
-        "reconciler": "Le Réconciliateur",
-        "element": "Élément",
-        "error": "Incomplet ! Remplissez tous les champs.",
+        "title": "Oracle Céleste", "subtitle": "Portail de Géomancie Moderne", "btn": "Générer le Blason",
+        "mother_tab": "Mère", "row": "Ligne", "foundation": "I. La Fondation",
+        "nephews": "II. Les Neveux", "court": "III. Le Verdict",
+        "witness_r": "Témoin Droit", "witness_l": "Témoin Gauche", "judge": "Le Juge",
+        "reconciler": "Le Réconciliateur", "element": "Élément", "error": "Remplissez tous les champs."
     }
 }
 
@@ -60,13 +42,13 @@ def add_figs(f1, f2):
     return [2 if (r1 + r2) % 2 == 0 else 1 for r1, r2 in zip(f1, f2)]
 
 def render_card(fig, label, color, size="18px", glow=False):
-    glow_style = f"box-shadow: 0 0 20px {color}44;" if glow else ""
+    glow_style = f"box-shadow: 0 10px 30px {color}33;" if glow else "box-shadow: 0 4px 12px rgba(0,0,0,0.05);"
     rows = "".join([f"<div style='font-size: {size}; color: {color}; margin: 2px 0;'>{'●' if r == 1 else '●&nbsp;&nbsp;&nbsp;●'}</div>" for r in fig])
     return f"""
-    <div style="background: rgba(20, 20, 25, 0.8); backdrop-filter: blur(10px); 
-                border: 1px solid {color}88; border-radius: 15px; padding: 15px; 
-                text-align: center; {glow_style} border-top: 4px solid {color};">
-        <div style="font-size: 0.7em; color: #888; text-transform: uppercase; margin-bottom: 8px;">{label}</div>
+    <div style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); 
+                border: 1px solid #e0e0e0; border-radius: 20px; padding: 20px; 
+                text-align: center; {glow_style} transition: all 0.3s ease;">
+        <div style="font-size: 0.75em; color: #888; font-weight: 600; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 1px;">{label}</div>
         {rows}
     </div>
     """
@@ -76,27 +58,38 @@ def process_input(s):
     return (1 if len(clean) % 2 != 0 else 2) if clean else None
 
 # --- 3. APP UI ---
-st.set_page_config(page_title="Geomancy 2026", layout="wide")
+st.set_page_config(page_title="Oracle 2026", layout="wide")
 
-# Sidebar for Language
 lang_choice = st.sidebar.selectbox("Language / Langue", ["English", "Français"])
 L = "EN" if lang_choice == "English" else "FR"
 T = UI_TEXT[L]
 
-# Global CSS
+# Celestial Platinum Theme CSS
 st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;600&family=Cinzel:wght@600&display=swap');
-    html, body, [data-testid="stAppViewContainer"] { background-color: #0a0a0c; font-family: 'Inter', sans-serif; }
-    h1 { font-family: 'Cinzel', serif; font-size: 3rem !important; text-align: center; color: #D4AF37; }
-    .stTextInput input { background: #1a1a1f; border: 1px solid #333; color: white; text-align: center; border-radius: 8px; }
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Outfit:wght@400;700&display=swap');
+    
+    html, body, [data-testid="stAppViewContainer"] { 
+        background: linear-gradient(135deg, #f8f9ff 0%, #eef2f7 100%); 
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        color: #2d3436;
+    }
+    h1 { font-family: 'Outfit', sans-serif; font-weight: 800; color: #1e272e !important; text-align: center; font-size: 3.5rem !important; margin-bottom: 0px !important;}
+    .stTextInput input { 
+        background: white; border: 2px solid #eef2f7; border-radius: 12px; 
+        color: #4a69bd; text-align: center; font-weight: bold; height: 50px;
+    }
+    .stTabs [data-baseweb="tab"] { font-weight: 600; color: #888; }
+    .stTabs [data-baseweb="tab-list"] { background: transparent; }
+    div[data-testid="stExpander"] { background: white; border-radius: 15px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
     </style>
     """, unsafe_allow_html=True)
 
 st.title(T["title"])
-st.markdown(f"<p style='text-align: center; color: #666;'>{T['subtitle']}</p>", unsafe_allow_html=True)
+st.markdown(f"<p style='text-align: center; color: #888; font-size: 1.1rem; margin-top: -10px;'>{T['subtitle']}</p>", unsafe_allow_html=True)
 
-# Input Tabs
+# Input Section
+st.markdown("<br>", unsafe_allow_html=True)
 mothers_input = []
 tabs = st.tabs([f"{T['mother_tab']} {i+1}" for i in range(4)])
 for i in range(4):
@@ -127,26 +120,27 @@ if st.button(T["btn"], use_container_width=True, type="primary"):
     
     # Dynamic Elements
     rec_data = GEOMANTIC_DATA[tuple(Reconciler)]
-    colors = {"Fire": "#FF3E3E", "Air": "#00E5FF", "Water": "#00FFA3", "Earth": "#FFB800"}
-    C = colors.get(rec_data["element"], "#D4AF37")
+    # Soft Modern Colors
+    colors = {"Fire": "#f76b1c", "Air": "#4a69bd", "Water": "#00b894", "Earth": "#636e72"}
+    C = colors.get(rec_data["element"], "#4a69bd")
 
-    # Inject Dynamic Theme
-    st.markdown(f"<style>h2, h3 {{ color: {C} !important; }} .stButton>button {{ background: {C} !important; color: black !important; border: none !important; font-weight: bold; }}</style>", unsafe_allow_html=True)
+    st.markdown(f"<style>h2, h3 {{ color: {C} !important; }} .stButton>button {{ background: {C} !important; border: none !important; border-radius: 15px; height: 55px; font-weight: 700; }}</style>", unsafe_allow_html=True)
 
-    # MANDATORY SHIELD DISPLAY
+    # 1. Foundation
     st.header(T["foundation"])
     f_cols = st.columns(8)
     for i, fig in enumerate(M + D):
         label = f"{'M' if i < 4 else 'D'}{i+1 if i < 4 else i-3}"
         f_cols[i].markdown(render_card(fig, label, C), unsafe_allow_html=True)
-        f_cols[i].caption(f"<center>{GEOMANTIC_DATA[tuple(fig)]['name']}</center>", unsafe_allow_html=True)
+        f_cols[i].caption(f"<center><b>{GEOMANTIC_DATA[tuple(fig)]['name']}</b></center>", unsafe_allow_html=True)
 
+    # 2. Nephews
     st.header(T["nephews"])
     n_cols = st.columns(4)
     for i, fig in enumerate(N):
         n_cols[i].markdown(render_card(fig, f"N{i+1}", C), unsafe_allow_html=True)
 
-    # FINAL COURT
+    # 3. Court
     st.divider()
     st.header(T["court"])
     
@@ -159,9 +153,9 @@ if st.button(T["btn"], use_container_width=True, type="primary"):
     
     with res_j:
         j_info = GEOMANTIC_DATA[tuple(Judge)]
-        st.markdown(render_card(Judge, T["judge"], C, size="30px", glow=True), unsafe_allow_html=True)
-        st.markdown(f"<div style='background:rgba(255,255,255,0.05); padding:20px; border-radius:10px; border-left: 5px solid {C};'><h3>{j_info['name']}</h3>{j_info['meaning'][L]}</div>", unsafe_allow_html=True)
+        st.markdown(render_card(Judge, T["judge"], C, size="35px", glow=True), unsafe_allow_html=True)
+        st.markdown(f"<div style='background: white; padding: 25px; border-radius: 20px; border-bottom: 5px solid {C}; box-shadow: 0 4px 15px rgba(0,0,0,0.05);'><h3>{j_info['name']}</h3>{j_info['meaning'][L]}</div>", unsafe_allow_html=True)
         
     with res_r:
-        st.markdown(render_card(Reconciler, T["reconciler"], C, size="30px", glow=True), unsafe_allow_html=True)
-        st.markdown(f"<div style='background:rgba(255,255,255,0.05); padding:20px; border-radius:10px; border-left: 5px solid {C};'><h3>{rec_info['name']}</h3><b>{T['element']}: {rec_info['element']}</b><br><br>{rec_info['meaning'][L]}</div>", unsafe_allow_html=True)
+        st.markdown(render_card(Reconciler, T["reconciler"], C, size="35px", glow=True), unsafe_allow_html=True)
+        st.markdown(f"<div style='background: white; padding: 25px; border-radius: 20px; border-bottom: 5px solid {C}; box-shadow: 0 4px 15px rgba(0,0,0,0.05);'><h3>{rec_data['name']}</h3><b>{T['element']}: {rec_data['element']}</b><br><br>{rec_data['meaning'][L]}</div>", unsafe_allow_html=True)
