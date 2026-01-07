@@ -1,6 +1,6 @@
 import streamlit as st
 
-# --- Data: Figures, Elements, and Bilingual Meanings ---
+# --- 1. FULL TRANSLATION & DATA MAP ---
 GEOMANTIC_DATA = {
     (1, 1, 1, 1): {"name": "Via", "element": "Water", "meaning": {"EN": "Change and movement. Success through moving forward.", "FR": "Changement et mouvement. Succès en allant de l'avant."}},
     (2, 2, 2, 2): {"name": "Populus", "element": "Water", "meaning": {"EN": "The Crowd. Stability, neutrality, and following the flow.", "FR": "La Foule. Stabilité, neutralité et suivre le flux."}},
@@ -20,122 +20,148 @@ GEOMANTIC_DATA = {
     (1, 1, 1, 2): {"name": "Cauda Draconis", "element": "Fire", "meaning": {"EN": "Dragon's Tail. Endings and karmic exit points.", "FR": "Queue du Dragon. Fins et achèvement karmique."}}
 }
 
-# --- Core Logic ---
+UI_TEXT = {
+    "EN": {
+        "title": "Celestial Oracle 2026",
+        "subtitle": "Modern Science of the Sands",
+        "btn": "Cast the Shield",
+        "mother_tab": "Mother",
+        "row": "Row",
+        "foundation": "I. The Foundation (Mothers & Daughters)",
+        "nephews": "II. The Nephews",
+        "court": "III. The Verdict",
+        "witness_r": "Right Witness",
+        "witness_l": "Left Witness",
+        "judge": "The Judge",
+        "reconciler": "The Reconciler",
+        "element": "Element",
+        "error": "Incomplete! Fill all fields.",
+    },
+    "FR": {
+        "title": "Oracle Céleste 2026",
+        "subtitle": "Science Moderne des Sables",
+        "btn": "Générer le Blason",
+        "mother_tab": "Mère",
+        "row": "Ligne",
+        "foundation": "I. La Fondation (Mères & Filles)",
+        "nephews": "II. Les Neveux",
+        "court": "III. Le Verdict",
+        "witness_r": "Témoin Droit",
+        "witness_l": "Témoin Gauche",
+        "judge": "Le Juge",
+        "reconciler": "Le Réconciliateur",
+        "element": "Élément",
+        "error": "Incomplet ! Remplissez tous les champs.",
+    }
+}
+
+# --- 2. LOGIC FUNCTIONS ---
 def add_figs(f1, f2):
     return [2 if (r1 + r2) % 2 == 0 else 1 for r1, r2 in zip(f1, f2)]
 
-def render_fig_modern(fig_list, name="", color="#D4AF37", size="18px", glow=False):
-    glow_style = f"box-shadow: 0 0 15px {color}66;" if glow else ""
-    rows_html = "".join([f"<div style='font-size: {size}; color: {color}; margin: 5px 0;'>{'●' if r == 1 else '●&nbsp;&nbsp;&nbsp;●'}</div>" for r in fig_list])
+def render_card(fig, label, color, size="18px", glow=False):
+    glow_style = f"box-shadow: 0 0 20px {color}44;" if glow else ""
+    rows = "".join([f"<div style='font-size: {size}; color: {color}; margin: 2px 0;'>{'●' if r == 1 else '●&nbsp;&nbsp;&nbsp;●'}</div>" for r in fig])
     return f"""
-    <div style="background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); 
-                border: 1px solid {color}44; border-radius: 15px; padding: 20px; 
-                text-align: center; {glow_style} transition: transform 0.3s ease;">
-        <div style="font-size: 0.7em; color: #aaa; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px;">{name}</div>
-        {rows_html}
+    <div style="background: rgba(20, 20, 25, 0.8); backdrop-filter: blur(10px); 
+                border: 1px solid {color}88; border-radius: 15px; padding: 15px; 
+                text-align: center; {glow_style} border-top: 4px solid {color};">
+        <div style="font-size: 0.7em; color: #888; text-transform: uppercase; margin-bottom: 8px;">{label}</div>
+        {rows}
     </div>
     """
 
-def process_input(input_str):
-    clean = input_str.replace(" ", "")
+def process_input(s):
+    clean = s.replace(" ", "")
     return (1 if len(clean) % 2 != 0 else 2) if clean else None
 
-# --- UI Setup ---
-st.set_page_config(page_title="Geomancy 2026", layout="wide", initial_sidebar_state="collapsed")
+# --- 3. APP UI ---
+st.set_page_config(page_title="Geomancy 2026", layout="wide")
 
-# Inject Modern CSS
+# Sidebar for Language
+lang_choice = st.sidebar.selectbox("Language / Langue", ["English", "Français"])
+L = "EN" if lang_choice == "English" else "FR"
+T = UI_TEXT[L]
+
+# Global CSS
 st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&family=Playfair+Display:wght@700&display=swap');
-    
-    html, body, [data-testid="stAppViewContainer"] {
-        background: radial-gradient(circle at top right, #1a1a2e, #16213e, #0f3460);
-        font-family: 'Inter', sans-serif;
-    }
-    h1 { font-family: 'Playfair Display', serif; font-size: 3.5rem !important; text-align: center; margin-bottom: 0px !important; }
-    .stTabs [data-baseweb="tab-list"] { gap: 10px; background-color: transparent; }
-    .stTabs [data-baseweb="tab"] {
-        background-color: rgba(255, 255, 255, 0.05); border-radius: 10px 10px 0 0;
-        padding: 10px 20px; color: white; border: none;
-    }
-    .stTextInput input {
-        border-radius: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-        color: #D4AF37; text-align: center; font-size: 1.2rem;
-    }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;600&family=Cinzel:wght@600&display=swap');
+    html, body, [data-testid="stAppViewContainer"] { background-color: #0a0a0c; font-family: 'Inter', sans-serif; }
+    h1 { font-family: 'Cinzel', serif; font-size: 3rem !important; text-align: center; color: #D4AF37; }
+    .stTextInput input { background: #1a1a1f; border: 1px solid #333; color: white; text-align: center; border-radius: 8px; }
     </style>
     """, unsafe_allow_html=True)
 
-# Language Switch
-sel_lang = st.selectbox("", ["English", "Français"], label_visibility="collapsed")
-L = "EN" if sel_lang == "English" else "FR"
+st.title(T["title"])
+st.markdown(f"<p style='text-align: center; color: #666;'>{T['subtitle']}</p>", unsafe_allow_html=True)
 
-st.title("Celestial Oracle" if L == "EN" else "L'Oracle Céleste")
-st.markdown(f"<p style='text-align: center; color: #888; margin-bottom: 50px;'>{'The Modern Science of the Sands' if L == 'EN' else 'La Science Moderne des Sables'}</p>", unsafe_allow_html=True)
-
-# 1. Stepper Input for the 4 Mothers
-st.subheader("I. Initiation" if L == "EN" else "I. Initiation")
-tabs = st.tabs(["Mother 1", "Mother 2", "Mother 3", "Mother 4"] if L == "EN" else ["Mère 1", "Mère 2", "Mère 3", "Mère 4"])
+# Input Tabs
 mothers_input = []
-
+tabs = st.tabs([f"{T['mother_tab']} {i+1}" for i in range(4)])
 for i in range(4):
     with tabs[i]:
-        c1, c2, c3, c4 = st.columns(4)
+        cols = st.columns(4)
         m_rows = []
-        for j, col in enumerate([c1, c2, c3, c4]):
-            m_rows.append(col.text_input(f"M{i+1}L{j+1}", key=f"m{i}r{j}", label_visibility="collapsed", placeholder="••••"))
+        for j in range(4):
+            m_rows.append(cols[j].text_input(f"{T['row']} {j+1}", key=f"m{i}r{j}", placeholder="••••"))
         mothers_input.append(m_rows)
 
 st.markdown("<br>", unsafe_allow_html=True)
-if st.button("Unveil the Shield" if L == "EN" else "Dévoiler le Blason", use_container_width=True, type="primary"):
+
+if st.button(T["btn"], use_container_width=True, type="primary"):
     M = []
-    error = False
     for i, rows in enumerate(mothers_input):
         proc = [process_input(r) for r in rows]
         if None in proc:
-            st.error(f"Incomplete Data / Données Incomplètes")
-            error = True; break
+            st.error(T["error"])
+            st.stop()
         M.append(proc)
     
-    if not error:
-        # Math
-        D = [[M[j][i] for j in range(4)] for i in range(4)]
-        N = [add_figs(M[0], M[1]), add_figs(M[2], M[3]), add_figs(D[0], D[1]), add_figs(D[2], D[3])]
-        RW, LW = add_figs(N[0], N[1]), add_figs(N[2], N[3])
-        Judge = add_figs(RW, LW)
-        Reconciler = add_figs(Judge, M[0])
-        
-        # Element Theme
-        rec_info = GEOMANTIC_DATA[tuple(Reconciler)]
-        theme_color = {"Fire": "#FF4B2B", "Air": "#00d2ff", "Water": "#00f2fe", "Earth": "#f9d423"}.get(rec_info["element"])
+    # Derivations
+    D = [[M[j][i] for j in range(4)] for i in range(4)]
+    N = [add_figs(M[0], M[1]), add_figs(M[2], M[3]), add_figs(D[0], D[1]), add_figs(D[2], D[3])]
+    RW, LW = add_figs(N[0], N[1]), add_figs(N[2], N[3])
+    Judge = add_figs(RW, LW)
+    Reconciler = add_figs(Judge, M[0])
+    
+    # Dynamic Elements
+    rec_data = GEOMANTIC_DATA[tuple(Reconciler)]
+    colors = {"Fire": "#FF3E3E", "Air": "#00E5FF", "Water": "#00FFA3", "Earth": "#FFB800"}
+    C = colors.get(rec_data["element"], "#D4AF37")
 
-        # Update Headings with Glow
-        st.markdown(f"<style>h1, h2, h3 {{ color: {theme_color} !important; text-shadow: 0 0 20px {theme_color}44; }}</style>", unsafe_allow_html=True)
+    # Inject Dynamic Theme
+    st.markdown(f"<style>h2, h3 {{ color: {C} !important; }} .stButton>button {{ background: {C} !important; color: black !important; border: none !important; font-weight: bold; }}</style>", unsafe_allow_html=True)
 
-        # II. Mandatory Display: The Shield
-        st.header("II. The Universal Shield" if L == "EN" else "II. Le Blason Universel")
-        
-        # Display M and D in an elegant grid
-        f_cols = st.columns(8)
-        for i, fig in enumerate(M + D):
-            label = f"{'M' if i < 4 else 'D'}{i+1 if i < 4 else i-3}"
-            f_cols[i].markdown(render_fig_modern(fig, label, theme_color), unsafe_allow_html=True)
+    # MANDATORY SHIELD DISPLAY
+    st.header(T["foundation"])
+    f_cols = st.columns(8)
+    for i, fig in enumerate(M + D):
+        label = f"{'M' if i < 4 else 'D'}{i+1 if i < 4 else i-3}"
+        f_cols[i].markdown(render_card(fig, label, C), unsafe_allow_html=True)
+        f_cols[i].caption(f"<center>{GEOMANTIC_DATA[tuple(fig)]['name']}</center>", unsafe_allow_html=True)
 
-        # III. The Court
-        st.divider()
-        st.header("III. The Sacred Decree" if L == "EN" else "III. Le Décret Sacré")
+    st.header(T["nephews"])
+    n_cols = st.columns(4)
+    for i, fig in enumerate(N):
+        n_cols[i].markdown(render_card(fig, f"N{i+1}", C), unsafe_allow_html=True)
+
+    # FINAL COURT
+    st.divider()
+    st.header(T["court"])
+    
+    wit1, wit2 = st.columns(2)
+    wit1.markdown(render_card(RW, T["witness_r"], C), unsafe_allow_html=True)
+    wit2.markdown(render_card(LW, T["witness_l"], C), unsafe_allow_html=True)
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    res_j, res_r = st.columns(2)
+    
+    with res_j:
+        j_info = GEOMANTIC_DATA[tuple(Judge)]
+        st.markdown(render_card(Judge, T["judge"], C, size="30px", glow=True), unsafe_allow_html=True)
+        st.markdown(f"<div style='background:rgba(255,255,255,0.05); padding:20px; border-radius:10px; border-left: 5px solid {C};'><h3>{j_info['name']}</h3>{j_info['meaning'][L]}</div>", unsafe_allow_html=True)
         
-        w1, w2 = st.columns(2)
-        w1.markdown(render_fig_modern(RW, "Right Witness", theme_color), unsafe_allow_html=True)
-        w2.markdown(render_fig_modern(LW, "Left Witness", theme_color), unsafe_allow_html=True)
-        
-        st.markdown("<br>", unsafe_allow_html=True)
-        
-        res_j, res_r = st.columns(2)
-        with res_j:
-            j_data = GEOMANTIC_DATA[tuple(Judge)]
-            st.markdown(render_fig_modern(Judge, "Judge", theme_color, size="30px", glow=True), unsafe_allow_html=True)
-            st.markdown(f"<h3 style='text-align:center;'>{j_data['name']}</h3><p style='text-align:center;'>{j_data['meaning'][L]}</p>", unsafe_allow_html=True)
-            
-        with res_r:
-            st.markdown(render_fig_modern(Reconciler, "Reconciler", theme_color, size="30px", glow=True), unsafe_allow_html=True)
-            st.markdown(f"<h3 style='text-align:center;'>{rec_info['name']}</h3><p style='text-align:center;'><b>Element: {rec_info['element']}</b><br>{rec_info['meaning'][L]}</p>", unsafe_allow_html=True)
+    with res_r:
+        st.markdown(render_card(Reconciler, T["reconciler"], C, size="30px", glow=True), unsafe_allow_html=True)
+        st.markdown(f"<div style='background:rgba(255,255,255,0.05); padding:20px; border-radius:10px; border-left: 5px solid {C};'><h3>{rec_info['name']}</h3><b>{T['element']}: {rec_info['element']}</b><br><br>{rec_info['meaning'][L]}</div>", unsafe_allow_html=True)
