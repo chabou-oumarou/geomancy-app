@@ -1,81 +1,82 @@
 import streamlit as st
 
-# --- Translation Dictionary ---
+# --- Translation & Figure Data ---
 LANGS = {
     "English": {
-        "title": "🔮 The Complete Geomantic Oracle",
-        "desc": "Type random dots or marks in the fields below to cast your figures.",
-        "calc_btn": "Calculate The Shield",
-        "error_msg": "is incomplete. Please add dots to all rows.",
+        "title": "🔮 The Celestial Oracle",
+        "desc": "Input your random dots below. Let the ancient patterns reveal the path.",
+        "calc_btn": "Cast the Divine Shield",
+        "error_msg": "is incomplete. Fill all rows to proceed.",
         "foundation": "The Foundation (Mothers & Daughters)",
-        "court": "⚖️ The Court",
+        "court": "⚖️ The Sacred Court",
         "judge": "The Judge",
         "reconciler": "The Reconciler",
-        "verdict": "Verdict",
-        "insight": "Final Insight",
-        "view_all": "View Full Foundation (Mothers & Daughters)",
-        "placeholder": "e.g. ....",
         "figures": {
             (1, 1, 1, 1): {"name": "Via", "meaning": "Change and movement. Success through moving forward."},
-            (2, 2, 2, 2): {"name": "Populus", "meaning": "The Crowd. Neutrality, following the flow."},
-            (2, 1, 1, 2): {"name": "Conjunctio", "meaning": "The Junction. Coming together, contracts, and social interactions."},
-            (1, 2, 2, 1): {"name": "Carcer", "meaning": "The Prison. Delays, boundaries, and restriction."},
-            (2, 2, 1, 1): {"name": "Fortuna Major", "meaning": "Greater Fortune. Massive success and protection."},
+            (2, 2, 2, 2): {"name": "Populus", "meaning": "The Crowd. Stability, following the flow."},
+            (2, 1, 1, 2): {"name": "Conjunctio", "meaning": "The Junction. Union and social interactions."},
+            (1, 2, 2, 1): {"name": "Carcer", "meaning": "The Prison. Delays and necessary boundaries."},
+            (2, 2, 1, 1): {"name": "Fortuna Major", "meaning": "Greater Fortune. Inner strength and protection."},
             (1, 1, 2, 2): {"name": "Fortuna Minor", "meaning": "Lesser Fortune. Quick, external success."},
-            (2, 1, 2, 1): {"name": "Acquisitio", "meaning": "Gain. Financial profit and growth."},
-            (1, 2, 1, 2): {"name": "Amissio", "meaning": "Loss. Spending or letting go."},
+            (2, 1, 2, 1): {"name": "Acquisitio", "meaning": "Gain. Financial profit and spiritual growth."},
+            (1, 2, 1, 2): {"name": "Amissio", "meaning": "Loss. Spending or letting go for better."},
             (1, 2, 2, 2): {"name": "Laetitia", "meaning": "Joy. Health, happiness, and positive news."},
-            (2, 2, 2, 1): {"name": "Tristitia", "meaning": "Sorrow. Heavy energy, foundations, and staying low."},
-            (1, 2, 1, 1): {"name": "Puella", "meaning": "The Girl. Beauty, harmony, and pleasant social interactions."},
-            (1, 1, 2, 1): {"name": "Puer", "meaning": "The Boy. Energy, aggression, and impulsive action."},
+            (2, 2, 2, 1): {"name": "Tristitia", "meaning": "Sorrow. Heavy energy, staying low and building."},
+            (1, 2, 1, 1): {"name": "Puella", "meaning": "The Girl. Beauty and pleasant interactions."},
+            (1, 1, 2, 1): {"name": "Puer", "meaning": "The Boy. Energy, aggression, and bold action."},
             (2, 2, 1, 2): {"name": "Albus", "meaning": "White. Peace, wisdom, and clear communication."},
             (2, 1, 2, 2): {"name": "Rubeus", "meaning": "Red. Passion and vice. A warning to pause."},
-            (2, 1, 1, 1): {"name": "Caput Draconis", "meaning": "Dragon's Head. New beginnings and entry points."},
-            (1, 1, 1, 2): {"name": "Cauda Draconis", "meaning": "Dragon's Tail. Endings and exit points."}
+            (2, 1, 1, 1): {"name": "Caput Draconis", "meaning": "Dragon's Head. New beginnings."},
+            (1, 1, 1, 2): {"name": "Cauda Draconis", "meaning": "Dragon's Tail. Endings and karmic exit."}
         }
     },
     "Français": {
-        "title": "🔮 L'Oracle de Géomancie Classique",
-        "desc": "Tapez des points ou des marques au hasard dans les champs ci-dessous pour créer vos figures.",
-        "calc_btn": "Calculer le Blason",
-        "error_msg": "est incomplète. Veuillez ajouter des points à toutes les lignes.",
+        "title": "🔮 L'Oracle Céleste",
+        "desc": "Entrez vos points au hasard. Laissez les anciens motifs révéler le chemin.",
+        "calc_btn": "Lancer le Blason Divin",
+        "error_msg": "est incomplète. Remplissez toutes les lignes.",
         "foundation": "La Fondation (Mères & Filles)",
-        "court": "⚖️ Le Tribunal",
+        "court": "⚖️ Le Tribunal Sacré",
         "judge": "Le Juge",
         "reconciler": "Le Réconciliateur",
-        "verdict": "Verdict",
-        "insight": "Dernier Aperçu",
-        "view_all": "Voir la Fondation Complète (Mères & Filles)",
-        "placeholder": "ex: ....",
         "figures": {
             (1, 1, 1, 1): {"name": "Via", "meaning": "Changement et mouvement. Succès en allant de l'avant."},
-            (2, 2, 2, 2): {"name": "Populus", "meaning": "La Foule. Neutralité, suivre le flux."},
-            (2, 1, 1, 2): {"name": "Conjunctio", "meaning": "La Jonction. Union, contrats et interactions sociales."},
-            (1, 2, 2, 1): {"name": "Carcer", "meaning": "La Prison. Délais, limites et restrictions."},
-            (2, 2, 1, 1): {"name": "Fortuna Major", "meaning": "Grande Fortune. Succès massif et protection."},
+            (2, 2, 2, 2): {"name": "Populus", "meaning": "La Foule. Stabilité, suivre le flux."},
+            (2, 1, 1, 2): {"name": "Conjunctio", "meaning": "La Jonction. Union et interactions sociales."},
+            (1, 2, 2, 1): {"name": "Carcer", "meaning": "La Prison. Délais et limites nécessaires."},
+            (2, 2, 1, 1): {"name": "Fortuna Major", "meaning": "Grande Fortune. Force intérieure et protection."},
             (1, 1, 2, 2): {"name": "Fortuna Minor", "meaning": "Petite Fortune. Succès rapide et extérieur."},
-            (2, 1, 2, 1): {"name": "Acquisitio", "meaning": "Gain. Profit financier et croissance."},
-            (1, 2, 1, 2): {"name": "Amissio", "meaning": "Perte. Dépense ou lâcher-prise."},
+            (2, 1, 2, 1): {"name": "Acquisitio", "meaning": "Gain. Profit financier et croissance spirituelle."},
+            (1, 2, 1, 2): {"name": "Amissio", "meaning": "Perte. Dépense ou lâcher-prise pour le mieux."},
             (1, 2, 2, 2): {"name": "Laetitia", "meaning": "La Joie. Santé, bonheur et nouvelles positives."},
             (2, 2, 2, 1): {"name": "Tristitia", "meaning": "La Tristesse. Énergie lourde, fondations et discrétion."},
-            (1, 2, 1, 1): {"name": "Puella", "meaning": "La Jeune Fille. Beauté, harmonie et interactions plaisantes."},
+            (1, 2, 1, 1): {"name": "Puella", "meaning": "La Jeune Fille. Beauté et interactions plaisantes."},
             (1, 1, 2, 1): {"name": "Puer", "meaning": "Le Garçon. Énergie, agression et action impulsive."},
             (2, 2, 1, 2): {"name": "Albus", "meaning": "Le Blanc. Paix, sagesse et communication claire."},
-            (2, 1, 2, 2): {"name": "Rubeus", "meaning": "Le Rouge. Passion et vice. Un avertissement de pause."},
-            (2, 1, 1, 1): {"name": "Caput Draconis", "meaning": "Queue du Dragon. Nouveaux départs et points d'entrée."},
-            (1, 1, 1, 2): {"name": "Cauda Draconis", "meaning": "Tête du Dragon. Fins et points de sortie."}
+            (2, 1, 2, 2): {"name": "Rubeus", "meaning": "Le Rouge. Passion et vice. Un avertissement."},
+            (2, 1, 1, 1): {"name": "Caput Draconis", "meaning": "Tête du Dragon. Nouveaux départs."},
+            (1, 1, 1, 2): {"name": "Cauda Draconis", "meaning": "Queue du Dragon. Fins et achèvement karmique."}
         }
     }
 }
 
+# --- Functions ---
 def add_figs(f1, f2):
     return [2 if (r1 + r2) % 2 == 0 else 1 for r1, r2 in zip(f1, f2)]
 
-def render_fig(fig_list):
-    visual = ""
+def render_fig_html(fig_list, name=""):
+    """Creates a beautiful HTML representation of a geomantic figure."""
+    rows_html = ""
     for r in fig_list:
-        visual += "  ●  \n" if r == 1 else "●   ●\n"
-    return visual
+        dots = "●" if r == 1 else "● ●"
+        rows_html += f"<div style='font-size: 24px; color: #D4AF37; line-height: 1;'>{dots}</div>"
+    
+    return f"""
+    <div style="border: 1px solid #444; border-radius: 10px; padding: 15px; background: #1a1a1a; text-align: center; box-shadow: 2px 2px 10px rgba(0,0,0,0.5);">
+        <div style="font-weight: bold; color: #E0E0E0; margin-bottom: 5px;">{name}</div>
+        {rows_html}
+    </div>
+    """
 
 def process_input(input_str):
     clean_str = input_str.replace(" ", "")
@@ -85,33 +86,43 @@ def process_input(input_str):
 # --- App UI ---
 st.set_page_config(page_title="Geomancy Oracle", layout="wide")
 
-# Language Selector
+# Custom Styling
+st.markdown("""
+    <style>
+    .main { background-color: #0e1117; }
+    h1, h2, h3 { color: #D4AF37 !important; font-family: 'Garamond', serif; }
+    .stTextInput input { background-color: #1a1a1a; color: #D4AF37; border: 1px solid #444; }
+    </style>
+    """, unsafe_allow_html=True)
+
 sel_lang = st.sidebar.selectbox("Language / Langue", ["English", "Français"])
 T = LANGS[sel_lang]
 
 st.title(T["title"])
-st.write(T["desc"])
+st.write(f"*{T['desc']}*")
 
-# Input Layout for 4 Mothers
-mothers_input = []
-cols = st.columns(4)
-for i in range(4):
-    with cols[i]:
-        st.subheader(f"Mother {i+1}" if sel_lang == "English" else f"Mère {i+1}")
-        r1 = st.text_input(f"M{i+1} L1", key=f"m{i}r1", placeholder=T["placeholder"])
-        r2 = st.text_input(f"M{i+1} L2", key=f"m{i}r2", placeholder=T["placeholder"])
-        r3 = st.text_input(f"M{i+1} L3", key=f"m{i}r3", placeholder=T["placeholder"])
-        r4 = st.text_input(f"M{i+1} L4", key=f"m{i}r4", placeholder=T["placeholder"])
-        mothers_input.append([r1, r2, r3, r4])
+# Input Section
+with st.container():
+    mothers_input = []
+    cols = st.columns(4)
+    for i in range(4):
+        with cols[i]:
+            st.markdown(f"### M{i+1}")
+            r1 = st.text_input(f"L1", key=f"m{i}r1")
+            r2 = st.text_input(f"L2", key=f"m{i}r2")
+            r3 = st.text_input(f"L3", key=f"m{i}r3")
+            r4 = st.text_input(f"L4", key=f"m{i}r4")
+            mothers_input.append([r1, r2, r3, r4])
 
-if st.button(T["calc_btn"], type="primary"):
+st.markdown("<br>", unsafe_allow_html=True)
+
+if st.button(T["calc_btn"], use_container_width=True):
     M = []
     error = False
     for m_idx, m_rows in enumerate(mothers_input):
         processed_m = [process_input(r) for r in m_rows]
         if None in processed_m:
-            m_label = "Mother" if sel_lang == "English" else "Mère"
-            st.error(f"{m_label} {m_idx+1} {T['error_msg']}")
+            st.error(f"Mother {m_idx+1} {T['error_msg']}")
             error = True
             break
         M.append(processed_m)
@@ -126,25 +137,22 @@ if st.button(T["calc_btn"], type="primary"):
 
         st.divider()
         
-        # Court Display
+        # Main Display
         st.header(T["court"])
-        res_c1, res_c2, res_c3 = st.columns([1, 1, 2])
+        c1, c2, c3 = st.columns([1, 1, 2])
         
-        with res_c1:
-            st.subheader("Witness/Témoin R")
-            st.text(render_fig(RW))
-            st.write(T["figures"][tuple(RW)]["name"])
+        with c1:
+            st.markdown(render_fig_html(RW, "Witness R"), unsafe_allow_html=True)
+            st.write(f"**{T['figures'][tuple(RW)]['name']}**")
         
-        with res_c2:
-            st.subheader("Witness/Témoin L")
-            st.text(render_fig(LW))
-            st.write(T["figures"][tuple(LW)]["name"])
+        with c2:
+            st.markdown(render_fig_html(LW, "Witness L"), unsafe_allow_html=True)
+            st.write(f"**{T['figures'][tuple(LW)]['name']}**")
 
-        with res_c3:
-            st.subheader(T["judge"])
-            st.text(render_fig(Judge))
+        with c3:
             j_data = T["figures"][tuple(Judge)]
-            st.success(f"**{j_data['name']}**: {j_data['meaning']}")
+            st.markdown(render_fig_html(Judge, T["judge"]), unsafe_allow_html=True)
+            st.success(f"### {j_data['name']}\n{j_data['meaning']}")
 
         st.divider()
         
@@ -152,16 +160,7 @@ if st.button(T["calc_btn"], type="primary"):
         st.header(T["reconciler"])
         r_col1, r_col2 = st.columns([1, 4])
         with r_col1:
-            st.text(render_fig(Reconciler))
+            st.markdown(render_fig_html(Reconciler), unsafe_allow_html=True)
         with r_col2:
             r_data = T["figures"][tuple(Reconciler)]
             st.info(f"**{r_data['name']}**: {r_data['meaning']}")
-
-        with st.expander(T["view_all"]):
-            f_cols = st.columns(8)
-            all_f = M + D
-            for i, fig in enumerate(all_f):
-                label = f"M{i+1}" if i < 4 else f"D{i-3}"
-                f_cols[i].markdown(f"**{label}**")
-                f_cols[i].text(render_fig(fig))
-                f_cols[i].caption(T["figures"][tuple(fig)]["name"])
