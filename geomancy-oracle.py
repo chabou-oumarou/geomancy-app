@@ -1,6 +1,6 @@
 import streamlit as st
 
-# --- 1. DATA MAP (Figures, Elements, Meanings) ---
+# --- 1. DATA MAP ---
 GEOMANTIC_DATA = {
     (1, 1, 1, 1): {"name": "Via", "element": "Water", "meaning": {"EN": "Change and movement. Success through moving forward.", "FR": "Changement et mouvement. Succès en allant de l'avant."}},
     (2, 2, 2, 2): {"name": "Populus", "element": "Water", "meaning": {"EN": "The Crowd. Stability, neutrality, and following the flow.", "FR": "La Foule. Stabilité, neutralité et suivre le flux."}},
@@ -23,13 +23,13 @@ GEOMANTIC_DATA = {
 UI_TEXT = {
     "EN": {
         "title": "The Maroon Oracle", "subtitle": "House Mapping & Shield", "btn": "Generate Full Shield",
-        "mother": "Mother", "row": "Row", "foundation": "The 12 Houses (Mothers, Daughters, Nephews)",
+        "mother": "Mother", "row": "Row", "foundation": "The 12 Houses",
         "court": "The Final Verdict", "error": "Fill all 16 rows.", "reset": "Reset All"
     },
     "FR": {
         "title": "L'Oracle Marron", "subtitle": "Cartographie des Maisons", "btn": "Générer le Blason",
-        "mother": "Mère", "row": "Ligne", "foundation": "Les 12 Maisons (Mères, Filles, Neveux)",
-        "court": "Le Verdict Final", "error": "Remplissez les 16 lignes.", "reset": "Réinitialiser"
+        "mother": "Mère", "daughter": "Fille", "nephew": "Neveu", "row": "Ligne",
+        "foundation": "Les 12 Maisons", "court": "Le Verdict Final", "error": "Remplissez les 16 lignes.", "reset": "Réinitialiser"
     }
 }
 
@@ -39,25 +39,24 @@ def add_figs(f1, f2):
     return [2 if (r1 + r2) % 2 == 0 else 1 for r1, r2 in zip(f1, f2)]
 
 def render_small_scale(fig):
-    """Renders the small scale black dash/dot figure."""
-    small_html = "<div style='background: #f0f0f0; border-radius: 5px; padding: 5px; margin-top: 10px; display: inline-block;'>"
+    """Renders a Large-Scale black dash/dot figure for high visibility."""
+    small_html = "<div style='background: #f8f9fa; border-left: 2px solid #ddd; padding: 10px;'>"
     for r in fig:
         char = "●" if r == 1 else "—"
-        small_html += f"<div style='color: black; font-size: 12px; line-height: 1;'>{char}</div>"
+        small_html += f"<div style='color: black; font-size: 28px; font-weight: bold; line-height: 0.9;'>{char}</div>"
     small_html += "</div>"
     return small_html
 
 def render_card(fig, label, color=MAROON, size="35px", glow=False):
     glow_style = f"box-shadow: 0 10px 40px {color}33;" if glow else "box-shadow: 0 4px 15px rgba(0,0,0,0.05);"
-    rows = "".join([f"<div style='font-size: {size}; color: {color}; line-height: 1.1; margin: 4px 0;'>{'●' if r == 1 else '●&nbsp;&nbsp;&nbsp;&nbsp;●'}</div>" for r in fig])
+    rows = "".join([f"<div style='font-size: {size}; color: {color}; line-height: 1.1; margin: 2px 0;'>{'●' if r == 1 else '●&nbsp;&nbsp;&nbsp;&nbsp;●'}</div>" for r in fig])
     
-    # Adding the small scale result next to the main figure
     return f"""
-    <div style="background: white; border: 1px solid #edf0f2; border-radius: 20px; padding: 15px; text-align: center; {glow_style}">
-        <div style="font-size: 0.65rem; color: #a0a0a0; font-weight: 800; text-transform: uppercase; margin-bottom: 8px;">{label}</div>
-        <div style="display: flex; justify-content: space-around; align-items: center;">
-            <div>{rows}</div>
-            {render_small_scale(fig)}
+    <div style="background: white; border: 1px solid #edf0f2; border-radius: 20px; padding: 20px; text-align: center; {glow_style}">
+        <div style="font-size: 0.7rem; color: #a0a0a0; font-weight: 800; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 1px;">{label}</div>
+        <div style="display: flex; justify-content: center; align-items: center; gap: 25px;">
+            <div style="flex: 1;">{rows}</div>
+            <div style="flex: 1;">{render_small_scale(fig)}</div>
         </div>
     </div>
     """
@@ -72,7 +71,7 @@ st.markdown(f"""<style>
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;800&display=swap');
     html, body, [data-testid="stAppViewContainer"] {{ background-color: #f8fafc; font-family: 'Outfit', sans-serif; }}
     h1 {{ font-weight: 800; color: #1e272e !important; text-align: center; font-size: 3rem !important; }}
-    h2 {{ color: {MAROON} !important; border-bottom: 2px solid #edf0f2; padding-bottom: 10px; }}
+    h2 {{ color: {MAROON} !important; border-bottom: 2px solid #edf0f2; padding-bottom: 10px; margin-top: 30px !important; }}
     .stTextInput input {{ border-radius: 12px; border: 2px solid #edf0f2; text-align: center; font-weight: 600; }}
     .stButton>button {{ background: {MAROON} !important; color: white !important; border-radius: 20px !important; height: 65px !important; font-weight: 700 !important; font-size: 1.2rem !important; }}
     </style>""", unsafe_allow_html=True)
@@ -114,9 +113,8 @@ if st.button(T["btn"], use_container_width=True, type="primary"):
     Judge = add_figs(RW, LW)
     Reconciler = add_figs(Judge, M_figs[0])
 
-    # DISPLAY THE 12 HOUSES
+    # 12 HOUSES
     st.header(T["foundation"])
-    # 12 Houses: M1-M4 (Houses 1-4), D1-D4 (Houses 5-8), N1-N4 (Houses 9-12)
     houses = M_figs + D_figs + N_figs
     for i in range(0, 12, 4):
         cols = st.columns(4)
@@ -135,3 +133,7 @@ if st.button(T["btn"], use_container_width=True, type="primary"):
         j_info = GEOMANTIC_DATA[tuple(Judge)]
         st.markdown(render_card(Judge, "Judge", size="50px", glow=True), unsafe_allow_html=True)
         st.success(f"**{j_info['name']}**: {j_info['meaning'][L]}")
+
+    # RECONCILER
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown(render_card(Reconciler, "Reconciler", size="50px", glow=True), unsafe_allow_html=True)
