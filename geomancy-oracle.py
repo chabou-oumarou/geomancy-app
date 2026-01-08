@@ -1,6 +1,6 @@
 import streamlit as st
 
-# --- 1. DATA MAP (Figures, Elements, Meanings) ---
+# --- 1. DATA MAP ---
 GEOMANTIC_DATA = {
     (1, 1, 1, 1): {"name": "Via", "element": "Water", "meaning": {"EN": "Change and movement. Success through moving forward.", "FR": "Changement et mouvement. Succès en allant de l'avant."}},
     (2, 2, 2, 2): {"name": "Populus", "element": "Water", "meaning": {"EN": "The Crowd. Stability, neutrality, and following the flow.", "FR": "La Foule. Stabilité, neutralité et suivre le flux."}},
@@ -22,53 +22,55 @@ GEOMANTIC_DATA = {
 
 UI_TEXT = {
     "EN": {
-        "title": "Celestial Star Oracle", "subtitle": "Cast Your Future in Golden Stars", "btn": "Reveal the Divine Shield",
-        "mother_tab": "Mother", "row": "Row", "foundation": "I. The Foundation",
-        "nephews": "II. The Nephews", "court": "III. The Verdict",
+        "title": "Maroon Geomancy Oracle", "subtitle": "Classical Science of the Sands", "btn": "Generate Full Shield",
+        "mother_tab": "Mother", "row": "Row", "foundation": "I. Mothers & Daughters",
+        "nephews_sec": "II. The Nephews", "court": "III. The Verdict",
         "witness_r": "Right Witness", "witness_l": "Left Witness", "judge": "The Judge",
-        "reconciler": "The Reconciler", "element": "Element", "error": "All 16 fields must be filled."
+        "reconciler": "The Reconciler", "error": "Fill all 16 rows.", "reset": "Reset Inputs"
     },
     "FR": {
-        "title": "Oracle des Étoiles", "subtitle": "Lancez Votre Avenir en Étoiles d'Or", "btn": "Dévoiler le Blason Divin",
-        "mother_tab": "Mère", "row": "Ligne", "foundation": "I. La Fondation",
-        "nephews": "II. Les Neveux", "court": "III. Le Verdict",
+        "title": "Oracle de Marron Céleste", "subtitle": "Science Classique des Sables", "btn": "Générer le Blason Complet",
+        "mother_tab": "Mère", "row": "Ligne", "foundation": "I. Mères & Filles",
+        "nephews_sec": "II. Les Neveux", "court": "III. Le Verdict",
         "witness_r": "Témoin Droit", "witness_l": "Témoin Gauche", "judge": "Le Juge",
-        "reconciler": "Le Réconciliateur", "element": "Élément", "error": "Les 16 champs doivent être remplis."
+        "reconciler": "Le Réconciliateur", "error": "Remplissez les 16 lignes.", "reset": "Réinitialiser"
     }
 }
+
+MAROON = "#800000"
 
 # --- 2. LOGIC FUNCTIONS ---
 def add_figs(f1, f2):
     return [2 if (r1 + r2) % 2 == 0 else 1 for r1, r2 in zip(f1, f2)]
 
-def render_star_mirror(input_str):
-    """Shows the user's current input as golden stars."""
+def render_dot_mirror(input_str):
+    """Shows the user's input as maroon dots in real-time."""
     clean = input_str.replace(" ", "")
-    count = len(clean)
-    if count == 0: return ""
-    stars = "★ " * count
-    return f"<div style='color: #D4AF37; font-size: 1.2rem; margin-top: -15px; margin-bottom: 10px; height: 20px;'>{stars}</div>"
+    if not clean: return "<div style='height:25px;'></div>"
+    dots = "● " * len(clean)
+    return f"<div style='color: {MAROON}; font-size: 1.1rem; margin-top: -15px; margin-bottom: 5px;'>{dots}</div>"
 
-def render_card(fig, label, color="#D4AF37", size="45px", glow=False):
-    glow_style = f"box-shadow: 0 10px 40px {color}44;" if glow else "box-shadow: 0 4px 20px rgba(0,0,0,0.06);"
-    rows = "".join([f"<div style='font-size: {size}; color: {color}; line-height: 1; margin: 5px 0;'>{'★' if r == 1 else '★&nbsp;&nbsp;&nbsp;★'}</div>" for r in fig])
-    return f"""<div style="background: white; border: 1px solid #edf0f2; border-radius: 24px; padding: 25px; text-align: center; {glow_style}"><div style="font-size: 0.7rem; color: #a0a0a0; font-weight: 800; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 2px;">{label}</div>{rows}</div>"""
+def render_card(fig, label, color=MAROON, size="30px", glow=False):
+    glow_style = f"box-shadow: 0 10px 40px {color}33;" if glow else "box-shadow: 0 4px 15px rgba(0,0,0,0.05);"
+    rows = "".join([f"<div style='font-size: {size}; color: {color}; line-height: 1.1;'>{'●' if r == 1 else '●&nbsp;&nbsp;&nbsp;●'}</div>" for r in fig])
+    return f"""<div style="background: white; border: 1px solid #edf0f2; border-radius: 20px; padding: 15px; text-align: center; {glow_style}">
+               <div style="font-size: 0.65rem; color: #a0a0a0; font-weight: 800; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 1px;">{label}</div>{rows}</div>"""
 
 def process_input(s):
     clean = s.replace(" ", "")
     return (1 if len(clean) % 2 != 0 else 2) if clean else None
 
 # --- 3. APP UI ---
-st.set_page_config(page_title="Star Oracle", layout="wide")
+st.set_page_config(page_title="Maroon Oracle", layout="wide")
 
-# Theme CSS
-st.markdown("""
+st.markdown(f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;800&display=swap');
-    html, body, [data-testid="stAppViewContainer"] { background-color: #f8fafc; font-family: 'Outfit', sans-serif; }
-    h1 { font-weight: 800; color: #1e272e !important; text-align: center; font-size: 3.5rem !important; }
-    .stTextInput input { border-radius: 12px; border: 2px solid #edf0f2; height: 45px; }
-    .stButton>button { background: #D4AF37 !important; color: white !important; border-radius: 20px !important; height: 60px !important; font-weight: 700 !important; border: none !important; }
+    html, body, [data-testid="stAppViewContainer"] {{ background-color: #f8fafc; font-family: 'Outfit', sans-serif; }}
+    h1 {{ font-weight: 800; color: #1e272e !important; text-align: center; font-size: 3rem !important; }}
+    h2 {{ color: {MAROON} !important; margin-top: 40px !important; border-bottom: 2px solid #edf0f2; padding-bottom: 10px; }}
+    .stTextInput input {{ border-radius: 12px; border: 2px solid #edf0f2; height: 40px; }}
+    .stButton>button {{ background: {MAROON} !important; color: white !important; border-radius: 20px !important; height: 60px !important; font-weight: 700 !important; border: none !important; }}
     </style>
     """, unsafe_allow_html=True)
 
@@ -76,10 +78,13 @@ lang_choice = st.sidebar.selectbox("🌐 Language", ["English", "Français"])
 L = "EN" if lang_choice == "English" else "FR"
 T = UI_TEXT[L]
 
-st.title(T["title"])
-st.markdown(f"<p style='text-align: center; color: #888; font-size: 1.2rem;'>{T['subtitle']}</p>", unsafe_allow_html=True)
+if st.sidebar.button(T["reset"]):
+    st.rerun()
 
-# --- THE STAR INPUT AREA ---
+st.title(T["title"])
+st.markdown(f"<p style='text-align: center; color: #888; font-size: 1.1rem;'>{T['subtitle']}</p>", unsafe_allow_html=True)
+
+# --- DOT INPUT AREA ---
 mothers_input = []
 tabs = st.tabs([f"{T['mother_tab']} {i+1}" for i in range(4)])
 for i in range(4):
@@ -89,11 +94,9 @@ for i in range(4):
         for j in range(4):
             with cols[j]:
                 val = st.text_input(f"{T['row']} {j+1}", key=f"m{i}r{j}")
-                st.markdown(render_star_mirror(val), unsafe_allow_html=True)
+                st.markdown(render_dot_mirror(val), unsafe_allow_html=True)
                 m_rows.append(val)
         mothers_input.append(m_rows)
-
-st.markdown("<br>", unsafe_allow_html=True)
 
 if st.button(T["btn"], use_container_width=True, type="primary"):
     M = []
@@ -103,32 +106,44 @@ if st.button(T["btn"], use_container_width=True, type="primary"):
             st.error(T["error"]); st.stop()
         M.append(proc)
     
-    # Calculations
+    # CALCULATIONS
     D = [[M[j][i] for j in range(4)] for i in range(4)]
     N = [add_figs(M[0], M[1]), add_figs(M[2], M[3]), add_figs(D[0], D[1]), add_figs(D[2], D[3])]
-    RW, LW = add_figs(N[0], N[1]), add_figs(N[2], N[3])
+    RW = add_figs(N[0], N[1])
+    LW = add_figs(N[2], N[3])
     Judge = add_figs(RW, LW)
     Reconciler = add_figs(Judge, M[0])
-    
-    GOLD = "#D4AF37"
-    
-    # Foundation
+
+    # I. FOUNDATION
     st.header(T["foundation"])
     f_cols = st.columns(8)
-    for i, fig in enumerate(M + D):
-        label = f"{'M' if i < 4 else 'D'}{i+1 if i < 4 else i-3}"
-        f_cols[i].markdown(render_card(fig, label, GOLD, size="30px"), unsafe_allow_html=True)
-        f_cols[i].caption(f"<center><b>{GEOMANTIC_DATA[tuple(fig)]['name']}</b></center>", unsafe_allow_html=True)
+    for i in range(4):
+        f_cols[i].markdown(render_card(M[i], f"M{i+1}"), unsafe_allow_html=True)
+        f_cols[i].caption(f"<center>{GEOMANTIC_DATA[tuple(M[i])]['name']}</center>", unsafe_allow_html=True)
+    for i in range(4):
+        f_cols[i+4].markdown(render_card(D[i], f"D{i+1}"), unsafe_allow_html=True)
+        f_cols[i+4].caption(f"<center>{GEOMANTIC_DATA[tuple(D[i])]['name']}</center>", unsafe_allow_html=True)
 
-    # Court
-    st.divider()
+    # II. NEPHEWS
+    st.header(T["nephews_sec"])
+    n_cols = st.columns(4)
+    for i in range(4):
+        n_cols[i].markdown(render_card(N[i], f"N{i+1}", size="35px"), unsafe_allow_html=True)
+        n_cols[i].caption(f"<center>{GEOMANTIC_DATA[tuple(N[i])]['name']}</center>", unsafe_allow_html=True)
+
+    # III. COURT
     st.header(T["court"])
+    w_c1, w_c2 = st.columns(2)
+    w_c1.markdown(render_card(RW, T["witness_r"], size="40px"), unsafe_allow_html=True)
+    w_c2.markdown(render_card(LW, T["witness_l"], size="40px"), unsafe_allow_html=True)
+    
+    st.markdown("<br>", unsafe_allow_html=True)
     res_j, res_r = st.columns(2)
     with res_j:
         j_info = GEOMANTIC_DATA[tuple(Judge)]
-        st.markdown(render_card(Judge, T["judge"], GOLD, size="65px", glow=True), unsafe_allow_html=True)
-        st.markdown(f"<div style='background: white; padding: 30px; border-radius: 28px; border-bottom: 6px solid {GOLD};'><h3>{j_info['name']}</h3>{j_info['meaning'][L]}</div>", unsafe_allow_html=True)
+        st.markdown(render_card(Judge, T["judge"], size="55px", glow=True), unsafe_allow_html=True)
+        st.markdown(f"<div style='background: white; padding: 25px; border-radius: 20px; border-bottom: 5px solid {MAROON};'><h3>{j_info['name']}</h3>{j_info['meaning'][L]}</div>", unsafe_allow_html=True)
     with res_r:
         rec_info = GEOMANTIC_DATA[tuple(Reconciler)]
-        st.markdown(render_card(Reconciler, T["reconciler"], GOLD, size="65px", glow=True), unsafe_allow_html=True)
-        st.markdown(f"<div style='background: white; padding: 30px; border-radius: 28px; border-bottom: 6px solid {GOLD};'><h3>{rec_info['name']}</h3><b>{T['element']}: {rec_info['element']}</b><br><br>{rec_info['meaning'][L]}</div>", unsafe_allow_html=True)
+        st.markdown(render_card(Reconciler, T["reconciler"], size="55px", glow=True), unsafe_allow_html=True)
+        st.markdown(f"<div style='background: white; padding: 25px; border-radius: 20px; border-bottom: 5px solid {MAROON};'><h3>{rec_info['name']}</h3><b>{rec_info['element']}</b><br><br>{rec_info['meaning'][L]}</div>", unsafe_allow_html=True)
