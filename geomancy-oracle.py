@@ -1,44 +1,114 @@
 import streamlit as st
 
-# --- 1. DATA MAP ---
-# Added 'rec_insight' to provide context specifically for the Reconciler's role
+# --- 1. FULL DATA MAP ---
 GEOMANTIC_DATA = {
-    (1, 1, 1, 1): {"name": "Via", "element": "Water", "rec_insight": {"EN": "The path remains open; you must continue moving forward to reach the end.", "FR": "Le chemin reste ouvert ; vous devez continuer à avancer pour atteindre le but."}},
-    (2, 2, 2, 2): {"name": "Populus", "element": "Water", "rec_insight": {"EN": "The outcome is public or involves many people. A stable, collective result.", "FR": "L'issue est publique ou implique de nombreuses personnes. Un résultat stable et collectif."}},
-    (2, 1, 1, 2): {"name": "Conjunctio", "element": "Air", "rec_insight": {"EN": "A final agreement or contract will bind the seeker to the result.", "FR": "Un accord final ou un contrat liera le demandeur au résultat."}},
-    (1, 2, 2, 1): {"name": "Carcer", "element": "Earth", "rec_insight": {"EN": "The result brings isolation or heavy responsibility. A binding conclusion.", "FR": "Le résultat apporte l'isolement ou une lourde responsabilité. Une conclusion contraignante."}},
-    (2, 2, 1, 1): {"name": "Fortuna Major", "element": "Earth", "rec_insight": {"EN": "Ultimate success. The seeker is perfectly aligned with a powerful victory.", "FR": "Succès ultime. Le chercheur est parfaitement aligné avec une victoire puissante."}},
-    (1, 1, 2, 2): {"name": "Fortuna Minor", "element": "Fire", "rec_insight": {"EN": "A swift, temporary success. Enjoy the moment, but don't expect it to last forever.", "FR": "Un succès rapide et temporaire. Profitez du moment, mais ne vous attendez pas à ce qu'il dure éternellement."}},
-    (2, 1, 2, 1): {"name": "Acquisitio", "element": "Air", "rec_insight": {"EN": "You gain more than you expected. The reconciliation brings profit.", "FR": "Vous gagnez plus que ce que vous espériez. La réconciliation apporte du profit."}},
-    (1, 2, 1, 2): {"name": "Amissio", "element": "Fire", "meaning": {"EN": "Loss.", "FR": "Perte."}, "rec_insight": {"EN": "To gain the result, something must be sacrificed. A let-go is necessary.", "FR": "Pour obtenir le résultat, quelque chose doit être sacrifié. Un lâcher-prise est nécessaire."}},
-    (1, 2, 2, 2): {"name": "Laetitia", "element": "Air", "rec_insight": {"EN": "The matter ends in celebration and true inner joy.", "FR": "L'affaire se termine par une célébration et une véritable joie intérieure."}},
-    (2, 2, 2, 1): {"name": "Tristitia", "element": "Earth", "rec_insight": {"EN": "The result is solid but heavy. It may bring sadness or require hard labor.", "FR": "Le résultat est solide mais lourd. Il peut apporter de la tristesse ou exiger un travail acharné."}},
-    (1, 2, 1, 1): {"name": "Puella", "element": "Water", "rec_insight": {"EN": "Harmony is restored through grace or the intervention of a woman.", "FR": "L'harmonie est restaurée par la grâce ou l'intervention d'une femme."}},
-    (1, 1, 2, 1): {"name": "Puer", "element": "Fire", "rec_insight": {"EN": "The outcome is reached through conflict or bold, masculine action.", "FR": "Le résultat est atteint par le conflit ou une action audacieuse et masculine."}},
-    (2, 2, 1, 2): {"name": "Albus", "element": "Air", "rec_insight": {"EN": "A peaceful resolution. Communication clarifies the final position.", "FR": "Une résolution pacifique. La communication clarifie la position finale."}},
-    (2, 1, 2, 2): {"name": "Rubeus", "element": "Fire", "rec_insight": {"EN": "A warning: the result contains hidden danger or explosive emotions.", "FR": "Un avertissement : le résultat contient un danger caché ou des émotions explosives."}},
-    (2, 1, 1, 1): {"name": "Caput Draconis", "element": "Earth", "rec_insight": {"EN": "A door opens to a completely new chapter of life.", "FR": "Une porte s'ouvre sur un chapitre de vie complètement nouveau."}},
-    (1, 1, 1, 2): {"name": "Cauda Draconis", "element": "Fire", "rec_insight": {"EN": "The matter is finally over. You must leave the past behind completely.", "FR": "L'affaire est enfin terminée. Vous devez laisser le passé derrière vous complètement."}}
+    (1, 1, 1, 1): {
+        "name": "Via", 
+        "meaning": {"EN": "Change, movement, and journeys.", "FR": "Changement, mouvement et voyages."},
+        "rec_insight": {"EN": "The path is open; keep moving to reach the final goal.", "FR": "Le chemin est ouvert ; continuez d'avancer pour atteindre le but final."}
+    },
+    (2, 2, 2, 2): {
+        "name": "Populus", 
+        "meaning": {"EN": "Stability, crowds, and public matters.", "FR": "Stabilité, foules et affaires publiques."},
+        "rec_insight": {"EN": "The result involves others; look for collective stability.", "FR": "Le résultat implique les autres ; recherchez la stabilité collective."}
+    },
+    (2, 1, 1, 2): {
+        "name": "Conjunctio", 
+        "meaning": {"EN": "Union, contracts, and joining together.", "FR": "Union, contrats et rapprochement."},
+        "rec_insight": {"EN": "A final agreement or union will seal the outcome.", "FR": "Un accord final ou une union scellera l'issue."}
+    },
+    (1, 2, 2, 1): {
+        "name": "Carcer", 
+        "meaning": {"EN": "Restriction, boundaries, and delay.", "FR": "Restriction, limites et retard."},
+        "rec_insight": {"EN": "The conclusion brings boundaries or heavy responsibilities.", "FR": "La conclusion apporte des limites ou de lourdes responsabilités."}
+    },
+    (2, 2, 1, 1): {
+        "name": "Fortuna Major", 
+        "meaning": {"EN": "Great fortune and inner strength.", "FR": "Grande fortune et force intérieure."},
+        "rec_insight": {"EN": "Ultimate protection and victory is assured.", "FR": "La protection ultime et la victoire sont assurées."}
+    },
+    (1, 1, 2, 2): {
+        "name": "Fortuna Minor", 
+        "meaning": {"EN": "Small success and swift external luck.", "FR": "Petite fortune et chance externe rapide."},
+        "rec_insight": {"EN": "A quick, temporary success that requires immediate action.", "FR": "Un succès rapide et temporaire qui nécessite une action immédiate."}
+    },
+    (2, 1, 2, 1): {
+        "name": "Acquisitio", 
+        "meaning": {"EN": "Profit, gain, and expansion.", "FR": "Profit, gain et expansion."},
+        "rec_insight": {"EN": "The reconciliation brings a significant increase or gain.", "FR": "La réconciliation apporte une augmentation ou un gain significatif."}
+    },
+    (1, 2, 1, 2): {
+        "name": "Amissio", 
+        "meaning": {"EN": "Loss and letting go.", "FR": "Perte et lâcher-prise."},
+        "rec_insight": {"EN": "To secure the outcome, a sacrifice or release is needed.", "FR": "Pour sécuriser l'issue, un sacrifice ou un abandon est nécessaire."}
+    },
+    (1, 2, 2, 2): {
+        "name": "Laetitia", 
+        "meaning": {"EN": "Joy, health, and positive news.", "FR": "Joie, santé et nouvelles positives."},
+        "rec_insight": {"EN": "The matter concludes with happiness and true inner joy.", "FR": "L'affaire se conclut par le bonheur et une véritable joie intérieure."}
+    },
+    (2, 2, 2, 1): {
+        "name": "Tristitia", 
+        "meaning": {"EN": "Sorrow, depth, and foundations.", "FR": "Tristesse, profondeur et fondations."},
+        "rec_insight": {"EN": "The result is solid but requires a serious, heavy effort.", "FR": "Le résultat est solide mais nécessite un effort sérieux et lourd."}
+    },
+    (1, 2, 1, 1): {
+        "name": "Puella", 
+        "meaning": {"EN": "Harmony, beauty, and grace.", "FR": "Harmonie, beauté et grâce."},
+        "rec_insight": {"EN": "Harmony is restored through kindness or social charm.", "FR": "L'harmonie est restaurée par la gentillesse ou le charme social."}
+    },
+    (1, 1, 2, 1): {
+        "name": "Puer", 
+        "meaning": {"EN": "Energy, action, and impulsive force.", "FR": "Énergie, action et force impulsive."},
+        "rec_insight": {"EN": "A bold, energetic push will decide the final result.", "FR": "Un élan audacieux et énergique décidera du résultat final."}
+    },
+    (2, 2, 1, 2): {
+        "name": "Albus", 
+        "meaning": {"EN": "Wisdom, peace, and clarity.", "FR": "Sagesse, paix et clarté."},
+        "rec_insight": {"EN": "A clear, peaceful resolution through honest communication.", "FR": "Une résolution claire et pacifique grâce à une communication honnête."}
+    },
+    (2, 1, 2, 2): {
+        "name": "Rubeus", 
+        "meaning": {"EN": "Passion, vice, and danger.", "FR": "Passion, vice et danger."},
+        "rec_insight": {"EN": "Warning: the final conclusion contains hidden volatile energy.", "FR": "Attention : la conclusion finale contient une énergie volatile cachée."}
+    },
+    (2, 1, 1, 1): {
+        "name": "Caput Draconis", 
+        "meaning": {"EN": "Beginnings and entry points.", "FR": "Commencements et points d'entrée."},
+        "rec_insight": {"EN": "The result marks the start of a completely new chapter.", "FR": "Le résultat marque le début d'un chapitre totalement nouveau."}
+    },
+    (1, 1, 1, 2): {
+        "name": "Cauda Draconis", 
+        "meaning": {"EN": "Endings and exit points.", "FR": "Fins et points de sortie."},
+        "rec_insight": {"EN": "The matter is finished; you must leave the past behind.", "FR": "L'affaire est terminée ; vous devez laisser le passé derrière vous."}
+    }
 }
 
-# General translations and UI settings
 UI_TEXT = {
-    "EN": {"rec_title": "The Reconciler's Interpretation", "rec_desc": "Bridges the Seeker to the Outcome"},
-    "FR": {"rec_title": "Interprétation du Réconciliateur", "rec_desc": "Relie le Chercheur au Résultat"}
+    "EN": {
+        "title": "Maroon Oracle", "subtitle": "Mothers, Houses & Shield", "btn": "Generate Full Shield",
+        "row": "Row", "foundation": "The 12 Houses (M1-M4, D1-D4, N1-N4)",
+        "court": "The Final Verdict", "rec_label": "The Reconciler (Synthesis)", "error": "Fill all fields.", "reset": "Reset All"
+    },
+    "FR": {
+        "title": "L'Oracle Marron", "subtitle": "Maisons et Blason", "btn": "Générer le Blason",
+        "row": "Ligne", "foundation": "Les 12 Maisons (M1-M4, D1-D4, N1-N4)",
+        "court": "Le Verdict Final", "rec_label": "Le Réconciliateur (Synthèse)", "error": "Remplissez tout.", "reset": "Réinitialiser"
+    }
 }
 
 MAROON = "#800000"
 
-# --- Logic & UI Functions ---
+# --- Functions ---
 def add_figs(f1, f2):
     return [2 if (r1 + r2) % 2 == 0 else 1 for r1, r2 in zip(f1, f2)]
 
 def render_small_scale(fig):
-    """Large black Mini-Map (2 dots = 1 dash)"""
-    small_html = "<div style='background: #f1f1f1; border-radius: 8px; padding: 10px;'>"
+    """Bigger Mini-Map (Dash/Dot)"""
+    small_html = "<div style='background: #f1f1f1; border-radius: 8px; padding: 10px; min-width: 50px;'>"
     for r in fig:
         char = "●" if r == 1 else "—"
-        small_html += f"<div style='color: black; font-size: 26px; font-weight: 900; line-height: 0.8;'>{char}</div>"
+        small_html += f"<div style='color: black; font-size: 32px; font-weight: 900; line-height: 0.7;'>{char}</div>"
     small_html += "</div>"
     return small_html
 
@@ -59,71 +129,84 @@ def process_input(s):
     clean = s.replace(" ", "")
     return (1 if len(clean) % 2 != 0 else 2) if clean else None
 
-# --- Main App ---
+# --- UI Layout ---
 st.set_page_config(page_title="Maroon Oracle", layout="wide")
-st.markdown(f"<style>h1, h2, h3 {{ color: {MAROON} !important; text-align: center; font-family: 'Outfit', sans-serif; }} .stButton>button {{ background: {MAROON} !important; color: white !important; }}</style>", unsafe_allow_html=True)
+st.markdown(f"""<style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;800&display=swap');
+    html, body, [data-testid="stAppViewContainer"] {{ background-color: #f8fafc; font-family: 'Outfit', sans-serif; }}
+    h1 {{ font-weight: 800; color: #1e272e !important; text-align: center; font-size: 3rem !important; }}
+    h2 {{ color: {MAROON} !important; border-bottom: 2px solid #edf0f2; padding-bottom: 10px; }}
+    .stTextInput input {{ border-radius: 10px; border: 1px solid #ddd; text-align: center; height: 35px; font-size: 1.1rem; }}
+    .stButton>button {{ background: {MAROON} !important; color: white !important; border-radius: 15px !important; height: 55px !important; font-weight: 700 !important; }}
+    </style>""", unsafe_allow_html=True)
 
-lang_choice = st.sidebar.selectbox("🌐 Language", ["English", "Français"])
+lang_choice = st.sidebar.selectbox("🌐 Language / Langue", ["English", "Français"])
 L = "EN" if lang_choice == "English" else "FR"
+T = UI_TEXT[L]
 
-st.title("L'Oracle Marron" if L == "FR" else "The Maroon Oracle")
+if st.sidebar.button(T["reset"]): st.rerun()
 
-# Inputs
+st.title(T["title"])
+st.markdown(f"<p style='text-align: center; color: #888;'>{T['subtitle']}</p>", unsafe_allow_html=True)
+
+# SIDE-BY-SIDE INPUTS
+st.markdown("<br>", unsafe_allow_html=True)
 m_cols = st.columns(4)
 mothers_input = []
 for i in range(4):
     with m_cols[i]:
-        st.markdown(f"### M{i+1}")
-        mothers_input.append([st.text_input(f"M{i+1}L{j+1}", key=f"m{i}r{j}", label_visibility="collapsed", placeholder="••••") for j in range(4)])
+        st.markdown(f"<h3 style='text-align:center; color:#555;'>M{i+1}</h3>", unsafe_allow_html=True)
+        m_rows = []
+        for j in range(4):
+            m_rows.append(st.text_input(f"M{i+1}L{j+1}", key=f"m{i}r{j}", label_visibility="collapsed", placeholder="••••"))
+        mothers_input.append(m_rows)
 
-if st.button("Generate Shield / Générer le Blason", use_container_width=True, type="primary"):
+if st.button(T["btn"], use_container_width=True, type="primary"):
     M_figs = []
     for i, rows in enumerate(mothers_input):
         proc = [process_input(r) for r in rows]
-        if None in proc: st.error("Fill all fields"); st.stop()
+        if None in proc: st.error(T["error"]); st.stop()
         M_figs.append(proc)
     
-    # Derivation
     D_figs = [[M_figs[j][i] for j in range(4)] for i in range(4)]
     N_figs = [add_figs(M_figs[0], M_figs[1]), add_figs(M_figs[2], M_figs[3]), add_figs(D_figs[0], D_figs[1]), add_figs(D_figs[2], D_figs[3])]
     RW, LW = add_figs(N_figs[0], N_figs[1]), add_figs(N_figs[2], N_figs[3])
     Judge = add_figs(RW, LW)
     Reconciler = add_figs(Judge, M_figs[0])
-    
-    # 1. Show Foundation (House M1-M4, D1-D4, N1-N4)
-    st.header("The 12 Houses / Les 12 Maisons")
-    h_data = M_figs + D_figs + N_figs
-    h_labels = ["M1", "M2", "M3", "M4", "D1", "D2", "D3", "D4", "N1", "N2", "N3", "N4"]
+
+    # 1. THE 12 HOUSES
+    st.header(T["foundation"])
+    labels = ["M1", "M2", "M3", "M4", "D1", "D2", "D3", "D4", "N1", "N2", "N3", "N4"]
+    data = M_figs + D_figs + N_figs
     for row in range(0, 12, 4):
         cols = st.columns(4)
         for c in range(4):
             idx = row + c
-            cols[c].markdown(render_card(h_data[idx], h_labels[idx]), unsafe_allow_html=True)
-            cols[c].caption(f"<center><b>{GEOMANTIC_DATA[tuple(h_data[idx])]['name']}</b></center>", unsafe_allow_html=True)
+            cols[c].markdown(render_card(data[idx], labels[idx]), unsafe_allow_html=True)
+            cols[c].caption(f"<center><b>{GEOMANTIC_DATA[tuple(data[idx])]['name']}</b></center>", unsafe_allow_html=True)
 
-    # 2. Show Court
-    st.header("The Verdict / Le Verdict")
+    # 2. THE FINAL VERDICT (JUDGE)
+    st.header(T["court"])
     c1, c2, c3 = st.columns([1, 1, 2])
-    with c1: st.markdown(render_card(RW, "Witness R (RW)"), unsafe_allow_html=True)
-    with c2: st.markdown(render_card(LW, "Witness L (LW)"), unsafe_allow_html=True)
+    with c1: st.markdown(render_card(RW, "RW (Witness R)"), unsafe_allow_html=True)
+    with c2: st.markdown(render_card(LW, "LW (Witness L)"), unsafe_allow_html=True)
     with c3:
-        st.markdown(render_card(Judge, "Judge", glow=True), unsafe_allow_html=True)
-        st.info(f"**{GEOMANTIC_DATA[tuple(Judge)]['name']}**")
+        j_info = GEOMANTIC_DATA[tuple(Judge)]
+        st.markdown(render_card(Judge, "The Judge", glow=True), unsafe_allow_html=True)
+        st.markdown(f"""<div style='background:white; border-left:8px solid {MAROON}; padding:20px; border-radius:15px; box-shadow:0 4px 10px rgba(0,0,0,0.05);'>
+                        <h3 style='margin:0; color:{MAROON};'>{j_info['name']}</h3>
+                        <p style='color:#666; font-size:1.1rem;'><b>{j_info['meaning'][L]}</b></p></div>""", unsafe_allow_html=True)
 
-    # 3. THE RECONCILER INTERPRETATION
+    # 3. THE RECONCILER (SAME DETAIL AS JUDGE)
     st.divider()
-    rec_fig_data = GEOMANTIC_DATA[tuple(Reconciler)]
-    st.header(UI_TEXT[L]["rec_title"])
-    
-    col_a, col_b = st.columns([1, 3])
-    with col_a:
+    st.header(T["rec_label"])
+    res_a, res_b = st.columns([1, 3])
+    with res_a:
         st.markdown(render_card(Reconciler, "Reconciler", glow=True), unsafe_allow_html=True)
-    with col_b:
-        st.markdown(f"""
-        <div style="background: white; border-left: 10px solid {MAROON}; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
-            <h2 style="margin-top:0; color:{MAROON};">{rec_fig_data['name']}</h2>
-            <p style="font-size: 1.1rem; color: #555;"><i>{UI_TEXT[L]["rec_desc"]}</i></p>
-            <hr>
-            <p style="font-size: 1.3rem; font-weight: bold; color: #2d3436;">{rec_fig_data['rec_insight'][L]}</p>
-        </div>
-        """, unsafe_allow_html=True)
+    with res_b:
+        r_info = GEOMANTIC_DATA[tuple(Reconciler)]
+        st.markdown(f"""<div style='background:white; border-left:12px solid {MAROON}; padding:30px; border-radius:15px; box-shadow:0 10px 30px rgba(0,0,0,0.08);'>
+                        <h2 style='margin:0; color:{MAROON};'>{r_info['name']}</h2>
+                        <p style='color:#555; font-size:1.2rem; margin-bottom:10px;'><i>{r_info['meaning'][L]}</i></p>
+                        <hr style='border:1px solid #eee;'>
+                        <p style='font-size:1.4rem; font-weight:bold; color:#2d3436; line-height:1.4;'>{r_info['rec_insight'][L]}</p></div>""", unsafe_allow_html=True)
