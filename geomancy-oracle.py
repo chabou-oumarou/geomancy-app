@@ -1,102 +1,150 @@
 import streamlit as st
 
-# --- 1. UPDATED DATA MAP WITH RECOMMENDATIONS ---
+# --- 1. SPIRITUALLY FOCUSED DATA MAP (AFRICAN CONTEXT) ---
 GEOMANTIC_DATA = {
     (1, 1, 1, 1): {
         "name": "Via", 
         "meaning": {"EN": "Change, movement, and journeys.", "FR": "Changement, mouvement et voyages."},
         "rec_insight": {"EN": "The path is open; keep moving to reach the final goal.", "FR": "Le chemin est ouvert ; continuez d'avancer pour atteindre le but final."},
-        "recommendation": {"EN": "Leave an offering at a crossroads or take a long walk to clear energy.", "FR": "Laissez une offrande à un carrefour ou faites une longue marche pour purifier l'énergie."}
+        "recommendation": {
+            "EN": "Pour a libation of cool water at the threshold of your home to clear the way for the ancestors.", 
+            "FR": "Versez une libation d'eau fraîche au seuil de votre maison pour ouvrir la voie aux ancêtres."
+        }
     },
     (2, 2, 2, 2): {
         "name": "Populus", 
         "meaning": {"EN": "Stability, crowds, and public matters.", "FR": "Stabilité, foules et affaires publiques."},
         "rec_insight": {"EN": "The result involves others; look for collective stability.", "FR": "Le résultat implique les autres ; recherchez la stabilité collective."},
-        "recommendation": {"EN": "Host a gathering or share a meal with a group to foster unity.", "FR": "Organisez un rassemblement ou partagez un repas avec un groupe pour favoriser l'unité."}
+        "recommendation": {
+            "EN": "Offer a communal bowl of kola nuts or fruit to the spirits of the marketplace to secure public favor.", 
+            "FR": "Offrez un bol de noix de cola ou de fruits aux esprits du marché pour obtenir la faveur du public."
+        }
     },
     (2, 1, 1, 2): {
         "name": "Conjunctio", 
         "meaning": {"EN": "Union, contracts, and joining together.", "FR": "Union, contrats et rapprochement."},
         "rec_insight": {"EN": "A final agreement or union will seal the outcome.", "FR": "Un accord final ou une union scellera l'issue."},
-        "recommendation": {"EN": "Exchange a small token or gift with a partner to seal a bond.", "FR": "Échangez un petit gage ou un cadeau avec un partenaire pour sceller un lien."}
+        "recommendation": {
+            "EN": "Bind two white threads around a sacred tree or family shrine to lock a spiritual covenant.", 
+            "FR": "Liez deux fils blancs autour d'un arbre sacré ou d'un autel familial pour sceller une alliance spirituelle."
+        }
     },
     (1, 2, 2, 1): {
         "name": "Carcer", 
         "meaning": {"EN": "Restriction, boundaries, and delay.", "FR": "Restriction, limites et retard."},
         "rec_insight": {"EN": "The conclusion brings boundaries or heavy responsibilities.", "FR": "La conclusion apporte des limites ou de lourdes responsabilités."},
-        "recommendation": {"EN": "Practice a day of silence or fasting to master your internal discipline.", "FR": "Pratiquez une journée de silence ou de jeûne pour maîtriser votre discipline interne."}
+        "recommendation": {
+            "EN": "Offer a small iron padlock or chain at an old crossroads to break spiritual stagnation.", 
+            "FR": "Offrez un petit cadenas ou une chaîne en fer à un vieux carrefour pour briser la stagnation spirituelle."
+        }
     },
     (2, 2, 1, 1): {
         "name": "Fortuna Major", 
         "meaning": {"EN": "Great fortune and inner strength.", "FR": "Grande fortune et force intérieure."},
         "rec_insight": {"EN": "Ultimate protection and victory is assured.", "FR": "La protection ultime et la victoire sont assurées."},
-        "recommendation": {"EN": "Make a significant charitable donation or offer high-quality incense.", "FR": "Faites un don charitable important ou offrez de l'encens de haute qualité."}
+        "recommendation": {
+            "EN": "Offer honey and expensive white cloth to the Orishas/Divinities as a 'Ebo' of gratitude for royal favor.", 
+            "FR": "Offrez du miel et un pagne blanc de prix aux Divinités en guise d'Ebo de gratitude pour la faveur royale."
+        }
     },
     (1, 1, 2, 2): {
         "name": "Fortuna Minor", 
         "meaning": {"EN": "Small success and swift external luck.", "FR": "Petite fortune et chance externe rapide."},
         "rec_insight": {"EN": "A quick, temporary success that requires immediate action.", "FR": "Un succès rapide et temporaire qui nécessite une action immédiate."},
-        "recommendation": {"EN": "Give a small coin to a stranger or a quick gift to a friend.", "FR": "Donnez une petite pièce à un inconnu ou un cadeau rapide à un ami."}
+        "recommendation": {
+            "EN": "Distribute small coins to the elders of your community to activate the blessing of the lineage.", 
+            "FR": "Distribuez des petites pièces aux anciens de votre communauté pour activer la bénédiction de la lignée."
+        }
     },
     (2, 1, 2, 1): {
         "name": "Acquisitio", 
         "meaning": {"EN": "Profit, gain, and expansion.", "FR": "Profit, gain et expansion."},
         "rec_insight": {"EN": "The reconciliation brings a significant increase or gain.", "FR": "La réconciliation apporte une augmentation ou un gain significatif."},
-        "recommendation": {"EN": "Plant a seed or invest in a physical object that will grow in value.", "FR": "Plantez une graine ou investissez dans un objet physique qui prendra de la valeur."}
+        "recommendation": {
+            "EN": "Bury a silver coin in a fertile patch of earth or at the foot of an Iroko tree to ground your wealth.", 
+            "FR": "Enterrez une pièce d'argent dans une terre fertile ou au pied d'un arbre Iroko pour enraciner votre richesse."
+        }
     },
     (1, 2, 1, 2): {
         "name": "Amissio", 
         "meaning": {"EN": "Loss and letting go.", "FR": "Perte et lâcher-prise."},
         "rec_insight": {"EN": "To secure the outcome, a sacrifice or release is needed.", "FR": "Pour sécuriser l'issue, un sacrifice ou un abandon est nécessaire."},
-        "recommendation": {"EN": "Sacrifice a habit or give away a cherished item to make room for the new.", "FR": "Sacrifiez une habitude ou donnez un objet cher pour faire de la place au nouveau."}
+        "recommendation": {
+            "EN": "Sacrifice a personal garment or a portion of your meal to the river spirits to wash away bad luck.", 
+            "FR": "Sacrifiez un vêtement personnel ou une portion de votre repas aux esprits de la rivière pour laver la malchance."
+        }
     },
     (1, 2, 2, 2): {
         "name": "Laetitia", 
         "meaning": {"EN": "Joy, health, and positive news.", "FR": "Joie, santé et nouvelles positives."},
         "rec_insight": {"EN": "The matter concludes with happiness and true inner joy.", "FR": "L'affaire se conclut par le bonheur et une véritable joie intérieure."},
-        "recommendation": {"EN": "Buy a bouquet of bright flowers or host a celebration for others.", "FR": "Achetez un bouquet de fleurs éclatantes ou organisez une fête pour les autres."}
+        "recommendation": {
+            "EN": "Perform a 'Lustration' (ritual bath) with palm wine and sweet herbs to attract benevolent spirits.", 
+            "FR": "Effectuez une lustration (bain rituel) au vin de palme et aux herbes douces pour attirer les esprits bienveillants."
+        }
     },
     (2, 2, 2, 1): {
         "name": "Tristitia", 
         "meaning": {"EN": "Sorrow, depth, and foundations.", "FR": "Tristesse, profondeur et fondations."},
         "rec_insight": {"EN": "The result is solid but requires a serious, heavy effort.", "FR": "Le résultat est solide mais nécessite un effort sérieux et lourd."},
-        "recommendation": {"EN": "Offer a stone to the earth or donate to a land conservation cause.", "FR": "Offrez une pierre à la terre ou faites un don à une cause de conservation des terres."}
+        "recommendation": {
+            "EN": "Offer dark earth or clay to the spirits of the underworld to stabilize a shaky foundation.", 
+            "FR": "Offrez de la terre noire ou de l'argile aux esprits du monde souterrain pour stabiliser une fondation fragile."
+        }
     },
     (1, 2, 1, 1): {
         "name": "Puella", 
         "meaning": {"EN": "Harmony, beauty, and grace.", "FR": "Harmonie, beauté et grâce."},
         "rec_insight": {"EN": "Harmony is restored through kindness or social charm.", "FR": "L'harmonie est restaurée par la gentillesse ou le charme social."},
-        "recommendation": {"EN": "Gift jewelry, perfume, or a work of art to someone you appreciate.", "FR": "Offrez des bijoux, du parfum ou une œuvre d'art à quelqu'un que vous appréciez."}
+        "recommendation": {
+            "EN": "Offer sweet scents or cowrie shells to the spirits of the water (Mami Wata) to preserve your beauty/grace.", 
+            "FR": "Offrez des parfums doux ou des cauris aux esprits de l'eau (Mami Wata) pour préserver votre beauté et votre grâce."
+        }
     },
     (1, 1, 2, 1): {
         "name": "Puer", 
         "meaning": {"EN": "Energy, action, and impulsive force.", "FR": "Énergie, action et force impulsive."},
         "rec_insight": {"EN": "A bold, energetic push will decide the final result.", "FR": "Un élan audacieux et énergique décidera du résultat final."},
-        "recommendation": {"EN": "Perform a strenuous physical task or gift sports equipment to a youth.", "FR": "Accomplissez une tâche physique ardue ou offrez du matériel de sport à un jeune."}
+        "recommendation": {
+            "EN": "Light a fire or offer red palm oil to the divinity of iron/war (Ogun) to sharpen your resolve.", 
+            "FR": "Allumez un feu ou offrez de l'huile de palme rouge à la divinité du fer (Ogun) pour aiguiser votre détermination."
+        }
     },
     (2, 2, 1, 2): {
         "name": "Albus", 
         "meaning": {"EN": "Wisdom, peace, and clarity.", "FR": "Sagesse, paix et clarté."},
         "rec_insight": {"EN": "A clear, peaceful resolution through honest communication.", "FR": "Une résolution claire et pacifique grâce à une communication honnête."},
-        "recommendation": {"EN": "Light a white candle or offer white flowers to a place of peace.", "FR": "Allumez une bougie blanche ou offrez des fleurs blanches dans un lieu de paix."}
+        "recommendation": {
+            "EN": "Offer white chalk (Efun) or milk at your family altar to invite ancestors of wisdom and peace.", 
+            "FR": "Offrez de la craie blanche (Efun) ou du lait sur votre autel familial pour inviter les ancêtres de sagesse et de paix."
+        }
     },
     (2, 1, 2, 2): {
         "name": "Rubeus", 
         "meaning": {"EN": "Passion, vice, and danger.", "FR": "Passion, vice et danger."},
         "rec_insight": {"EN": "Warning: the final conclusion contains hidden volatile energy.", "FR": "Attention : la conclusion finale contient une énergie volatile cachée."},
-        "recommendation": {"EN": "Offer red wine or flowers to appease energy; maintain strict vigilance.", "FR": "Offrez du vin rouge ou des fleurs pour apaiser l'énergie ; maintenez une vigilance stricte."}
+        "recommendation": {
+            "EN": "Sprinkle salt and pepper at your gate to confuse negative energies and avert the 'Evil Eye'.", 
+            "FR": "Saupoudrez du sel et du poivre à votre portail pour égarer les énergies négatives et détourner le mauvais œil."
+        }
     },
     (2, 1, 1, 1): {
         "name": "Caput Draconis", 
         "meaning": {"EN": "Beginnings and entry points.", "FR": "Commencements et points d'entrée."},
         "rec_insight": {"EN": "The result marks the start of a completely new chapter.", "FR": "Le résultat marque le début d'un chapitre totalement nouveau."},
-        "recommendation": {"EN": "Initiate a new project or gift a new book to someone starting a journey.", "FR": "Initiez un nouveau projet ou offrez un nouveau livre à quelqu'un qui commence un voyage."}
+        "recommendation": {
+            "EN": "Crack a fresh coconut and pour the water over your head to baptize your new path in life.", 
+            "FR": "Cassez une noix de coco fraîche et versez l'eau sur votre tête pour baptiser votre nouveau chemin de vie."
+        }
     },
     (1, 1, 1, 2): {
         "name": "Cauda Draconis", 
         "meaning": {"EN": "Endings and exit points.", "FR": "Fins et points de sortie."},
         "rec_insight": {"EN": "The matter is finished; you must leave the past behind.", "FR": "L'affaire est terminée ; vous devez laisser le passé derrière vous."},
-        "recommendation": {"EN": "Discard a broken item or finalize a debt to close the cycle.", "FR": "Jetez un objet cassé ou finalisez une dette pour fermer le cycle."}
+        "recommendation": {
+            "EN": "Sweep your house with a traditional broom and burn the dust at a crossroads to banish the old cycle.", 
+            "FR": "Balayez votre maison avec un balai traditionnel et brûlez la poussière à un carrefour pour bannir l'ancien cycle."
+        }
     }
 }
 
@@ -105,13 +153,13 @@ UI_TEXT = {
         "title": "Maroon Oracle", "subtitle": "Mothers, Houses & Shield", "btn": "Generate Full Shield",
         "row": "Row", "foundation": "The 12 Houses (M1-M4, D1-D4, N1-N4)",
         "court": "The Final Verdict", "rec_label": "The Reconciler (Synthesis)", "error": "Fill all fields.", 
-        "reset": "Reset All", "recommendation_title": "Action / Gift Recommendation"
+        "reset": "Reset All", "recommendation_title": "Spiritual Action (Ebo/Offering)"
     },
     "FR": {
         "title": "L'Oracle Marron", "subtitle": "Maisons et Blason", "btn": "Générer le Blason",
         "row": "Ligne", "foundation": "Les 12 Maisons (M1-M4, D1-D4, N1-N4)",
         "court": "Le Verdict Final", "rec_label": "Le Réconciliateur (Synthèse)", "error": "Remplissez tout.", 
-        "reset": "Réinitialiser", "recommendation_title": "Action / Recommandation de Cadeau"
+        "reset": "Réinitialiser", "recommendation_title": "Action Spirituelle (Ebo/Offrande)"
     }
 }
 
@@ -202,7 +250,7 @@ if st.button(T["btn"], use_container_width=True, type="primary"):
             fig_info = GEOMANTIC_DATA[fig_tuple]
             cols[c].markdown(render_card(data[idx], labels[idx]), unsafe_allow_html=True)
             cols[c].markdown(f"""<center><b>{fig_info['name']}</b><br>
-                                <span style='font-size:0.8rem; color:#888;'><i>{fig_info['recommendation'][L]}</i></span>
+                                <span style='font-size:0.75rem; color:#880000;'>✨ {fig_info['recommendation'][L]}</span>
                                 </center>""", unsafe_allow_html=True)
 
     # 2. THE FINAL VERDICT (JUDGE)
@@ -216,7 +264,7 @@ if st.button(T["btn"], use_container_width=True, type="primary"):
         st.markdown(f"""<div style='background:white; border-left:8px solid {MAROON}; padding:20px; border-radius:15px; box-shadow:0 4px 10px rgba(0,0,0,0.05); margin-top:10px;'>
                         <h3 style='margin:0; color:{MAROON};'>{j_info['name']}</h3>
                         <p style='color:#666; font-size:1.1rem;'><b>{j_info['meaning'][L]}</b></p>
-                        <p style='background:#fff5f5; padding:10px; border-radius:10px; color:#c0392b; font-weight:bold;'>💡 {T['recommendation_title']}: {j_info['recommendation'][L]}</p>
+                        <p style='background:#f9f1f1; border:1px solid #eedddd; padding:12px; border-radius:10px; color:#700000; font-weight:bold; font-size:0.95rem;'>🏺 {T['recommendation_title']}: {j_info['recommendation'][L]}</p>
                         </div>""", unsafe_allow_html=True)
 
     # 3. THE RECONCILER
@@ -232,8 +280,8 @@ if st.button(T["btn"], use_container_width=True, type="primary"):
                         <p style='color:#555; font-size:1.2rem; margin-bottom:10px;'><i>{r_info['meaning'][L]}</i></p>
                         <hr style='border:1px solid #eee;'>
                         <p style='font-size:1.4rem; font-weight:bold; color:#2d3436; line-height:1.4;'>{r_info['rec_insight'][L]}</p>
-                        <div style='margin-top:20px; padding:15px; background:#fdf2f2; border:1px dashed {MAROON}; border-radius:12px;'>
-                            <strong style='color:{MAROON};'>{T['recommendation_title']}:</strong><br>
-                            <span style='font-size:1.2rem; color:#444;'>{r_info['recommendation'][L]}</span>
+                        <div style='margin-top:20px; padding:20px; background:#fffafa; border:2px dashed {MAROON}; border-radius:12px;'>
+                            <strong style='color:{MAROON}; font-size:1.1rem;'>🕊️ {T['recommendation_title']}:</strong><br>
+                            <span style='font-size:1.25rem; color:#1e272e; font-style: italic;'>"{r_info['recommendation'][L]}"</span>
                         </div>
                         </div>""", unsafe_allow_html=True)
