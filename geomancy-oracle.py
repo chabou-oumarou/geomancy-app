@@ -153,13 +153,13 @@ UI_TEXT = {
         "title": "Maroon Oracle", "subtitle": "Hausa & Songhay Divination", "btn": "Generate Full Shield",
         "reset": "Reset All", "foundations": "1. Foundations (Mothers & Daughters)", "nephews": "2. The Nephews",
         "court": "3. The Court (Witnesses & Judge)", "reconciler": "4. The Reconciler (Final Synthesis)",
-        "rec_title": "Spiritual Sadaka", "error": "Please fill all fields."
+        "rec_title": "Spiritual Sadaka Required", "error": "Please fill all fields."
     },
     "FR": {
         "title": "L'Oracle Marron", "subtitle": "Divination Haoussa & Songhaï", "btn": "Générer le Blason",
         "reset": "Réinitialiser", "foundations": "1. Fondations (Mères & Filles)", "nephews": "2. Les Neveux",
         "court": "3. La Cour (Témoins & Juge)", "reconciler": "4. Le Réconciliateur (Synthèse Finale)",
-        "rec_title": "Sadaka Spirituelle", "error": "Veuillez remplir tous les champs."
+        "rec_title": "Sadaka Spirituelle Requise", "error": "Veuillez remplir tous les champs."
     }
 }
 
@@ -170,16 +170,16 @@ def add_figs(f1, f2):
     return [2 if (r1 + r2) % 2 == 0 else 1 for r1, r2 in zip(f1, f2)]
 
 def render_card(fig, label, latin, hausa, zarma, color=MAROON, highlight=False):
-    border = f"3px solid {color}" if highlight else "1px solid #edf0f2"
-    shadow = f"0 10px 30px {color}22" if highlight else "0 4px 15px rgba(0,0,0,0.05)"
-    rows = "".join([f"<div style='font-size: 32px; color: {color}; line-height: 1.0; margin: 2px 0;'>{'●' if r == 1 else '●&nbsp;&nbsp;●'}</div>" for r in fig])
+    border = f"4px solid {color}" if highlight else "1px solid #edf0f2"
+    shadow = f"0 15px 40px {color}33" if highlight else "0 6px 18px rgba(0,0,0,0.06)"
+    rows = "".join([f"<div style='font-size: 38px; color: {color}; line-height: 1.0; margin: 3px 0;'>{'●' if r == 1 else '●&nbsp;&nbsp;●'}</div>" for r in fig])
     
     return f"""
-    <div style="background: white; border: {border}; border-radius: 15px; padding: 15px; text-align: center; box-shadow: {shadow}; margin-bottom: 10px;">
-        <div style="font-size: 0.65rem; color: #a0a0a0; font-weight: 800; text-transform: uppercase;">{label}</div>
-        <div style="margin: 8px 0;">{rows}</div>
-        <div style="font-size: 0.8rem; font-weight: 800; color: #333;">{latin}</div>
-        <div style="font-size: 0.7rem; color: {color};"><i>{hausa} / {zarma}</i></div>
+    <div style="background: white; border: {border}; border-radius: 18px; padding: 18px; text-align: center; box-shadow: {shadow}; margin-bottom: 12px;">
+        <div style="font-size: 0.75rem; color: #a0a0a0; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">{label}</div>
+        <div style="margin: 10px 0;">{rows}</div>
+        <div style="font-size: 1.1rem; font-weight: 900; color: #111; margin-top: 5px;">{latin}</div>
+        <div style="font-size: 0.95rem; color: {color}; font-weight: 700;">{hausa} / {zarma}</div>
     </div>
     """
 
@@ -190,11 +190,11 @@ def process_input(s):
 # --- UI Layout ---
 st.set_page_config(page_title="Maroon Oracle", layout="wide")
 st.markdown(f"""<style>
-    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;800;900&display=swap');
     html, body, [data-testid="stAppViewContainer"] {{ background-color: #f8fafc; font-family: 'Outfit', sans-serif; }}
-    h1 {{ font-weight: 800; color: #1e272e !important; text-align: center; font-size: 2.5rem !important; }}
-    h2 {{ color: {MAROON} !important; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px; font-size: 1.5rem; }}
-    .stButton>button {{ background: {MAROON} !important; color: white !important; border-radius: 12px !important; height: 50px !important; width: 100%; }}
+    h1 {{ font-weight: 900; color: #1e272e !important; text-align: center; font-size: 3rem !important; }}
+    h2 {{ color: {MAROON} !important; border-bottom: 3px solid {MAROON}22; padding-bottom: 8px; margin-top: 35px; font-size: 1.8rem; font-weight: 800; }}
+    .stButton>button {{ background: {MAROON} !important; color: white !important; border-radius: 15px !important; height: 60px !important; width: 100%; font-size: 1.2rem !important; font-weight: 800 !important; }}
     </style>""", unsafe_allow_html=True)
 
 # SIDEBAR
@@ -204,32 +204,30 @@ T = UI_TEXT[L]
 if st.sidebar.button(T["reset"]): st.rerun()
 
 st.title(T["title"])
-st.markdown(f"<p style='text-align: center; color: #888; margin-top:-15px;'>{T['subtitle']}</p>", unsafe_allow_html=True)
+st.markdown(f"<p style='text-align: center; color: #666; margin-top:-20px; font-size: 1.2rem;'>{T['subtitle']}</p>", unsafe_allow_html=True)
 
-# INPUT SECTION (MOTHERS)
+# INPUT SECTION
 st.markdown("<br>", unsafe_allow_html=True)
 m_cols = st.columns(4)
 mothers_input = []
 for i in range(4):
     with m_cols[i]:
-        st.markdown(f"<p style='text-align:center; font-weight:bold; margin-bottom:5px;'>M{i+1}</p>", unsafe_allow_html=True)
+        st.markdown(f"<div style='text-align:center; font-weight:900; font-size:1.2rem; color:#444; margin-bottom:10px;'>M{i+1}</div>", unsafe_allow_html=True)
         m_rows = [st.text_input(f"M{i+1}L{j+1}", key=f"m{i}r{j}", label_visibility="collapsed", placeholder="••••") for j in range(4)]
         mothers_input.append(m_rows)
 
 if st.button(T["btn"], type="primary"):
-    # PROCESS LOGIC
     M_figs = []
     for rows in mothers_input:
         proc = [process_input(r) for r in rows]
         if None in proc: st.error(T["error"]); st.stop()
         M_figs.append(proc)
     
-    # 1. Logic Chains
-    D_figs = [[M_figs[j][i] for j in range(4)] for i in range(4)] # Daughters
+    D_figs = [[M_figs[j][i] for j in range(4)] for i in range(4)]
     N_figs = [add_figs(M_figs[0], M_figs[1]), add_figs(M_figs[2], M_figs[3]), 
-              add_figs(D_figs[0], D_figs[1]), add_figs(D_figs[2], D_figs[3])] # Nephews
-    RW = add_figs(N_figs[0], N_figs[1]) # Right Witness
-    LW = add_figs(N_figs[2], N_figs[3]) # Left Witness
+              add_figs(D_figs[0], D_figs[1]), add_figs(D_figs[2], D_figs[3])]
+    RW = add_figs(N_figs[0], N_figs[1])
+    LW = add_figs(N_figs[2], N_figs[3])
     Judge = add_figs(RW, LW)
     Reconciler = add_figs(Judge, M_figs[0])
 
@@ -241,46 +239,47 @@ if st.button(T["btn"], type="primary"):
     for i in range(8):
         info = GEOMANTIC_DATA[tuple(f_data[i])]
         f_cols[i].markdown(render_card(f_data[i], f_labels[i], info['latin'], info['hausa'], info['zarma']), unsafe_allow_html=True)
-        f_cols[i].markdown(f"<div style='font-size:0.65rem; color:#888; text-align:center;'>🏺 {info['recommendation'][L]}</div>", unsafe_allow_html=True)
+        f_cols[i].markdown(f"<div style='font-size:0.85rem; color:#700; text-align:center; line-height:1.2;'>***{info['recommendation'][L]}***</div>", unsafe_allow_html=True)
 
     # DISPLAY 2: NEPHEWS
     st.header(T["nephews"])
     n_cols = st.columns(4)
-    n_labels = ["N1 (M1+M2)", "N2 (M3+M4)", "N3 (D1+D2)", "N4 (D3+D4)"]
+    n_labels = ["N1", "N2", "N3", "N4"]
     for i in range(4):
         info = GEOMANTIC_DATA[tuple(N_figs[i])]
         n_cols[i].markdown(render_card(N_figs[i], n_labels[i], info['latin'], info['hausa'], info['zarma']), unsafe_allow_html=True)
-        n_cols[i].markdown(f"<div style='font-size:0.7rem; color:#888; text-align:center;'>🏺 {info['recommendation'][L]}</div>", unsafe_allow_html=True)
+        n_cols[i].markdown(f"<div style='font-size:0.9rem; color:#700; text-align:center; line-height:1.3;'>***{info['recommendation'][L]}***</div>", unsafe_allow_html=True)
 
     # DISPLAY 3: COURT
     st.header(T["court"])
     c_cols = st.columns([1, 1, 2])
     with c_cols[0]:
         info_rw = GEOMANTIC_DATA[tuple(RW)]
-        st.markdown(render_card(RW, "RW (N1+N2)", info_rw['latin'], info_rw['hausa'], info_rw['zarma']), unsafe_allow_html=True)
+        st.markdown(render_card(RW, "RW", info_rw['latin'], info_rw['hausa'], info_rw['zarma']), unsafe_allow_html=True)
     with c_cols[1]:
         info_lw = GEOMANTIC_DATA[tuple(LW)]
-        st.markdown(render_card(LW, "LW (N3+N4)", info_lw['latin'], info_lw['hausa'], info_lw['zarma']), unsafe_allow_html=True)
+        st.markdown(render_card(LW, "LW", info_lw['latin'], info_lw['hausa'], info_lw['zarma']), unsafe_allow_html=True)
     with c_cols[2]:
         info_j = GEOMANTIC_DATA[tuple(Judge)]
-        st.markdown(render_card(Judge, "JUDGE (RW+LW)", info_j['latin'], info_j['hausa'], info_j['zarma'], highlight=True), unsafe_allow_html=True)
-        st.markdown(f"""<div style='background:#fff; border-left:5px solid {MAROON}; padding:15px; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.05);'>
-                        <p style='margin:0; font-weight:bold; color:{MAROON};'>{info_j['meaning'][L]}</p>
-                        <p style='font-size:0.85rem; color:#666;'>✨ {info_j['recommendation'][L]}</p></div>""", unsafe_allow_html=True)
+        st.markdown(render_card(Judge, "JUDGE", info_j['latin'], info_j['hausa'], info_j['zarma'], highlight=True), unsafe_allow_html=True)
+        st.markdown(f"""<div style='background:#fff; border-left:8px solid {MAROON}; padding:20px; border-radius:15px; box-shadow:0 4px 15px rgba(0,0,0,0.08);'>
+                        <p style='margin:0; font-weight:900; color:{MAROON}; font-size:1.3rem;'>{info_j['meaning'][L]}</p>
+                        <p style='font-size:1.1rem; color:#333; margin-top:10px;'>🏺 ***{info_j['recommendation'][L]}***</p></div>""", unsafe_allow_html=True)
 
     # DISPLAY 4: RECONCILER
     st.header(T["reconciler"])
     rec_cols = st.columns([1, 3])
     info_rec = GEOMANTIC_DATA[tuple(Reconciler)]
     with rec_cols[0]:
-        st.markdown(render_card(Reconciler, "Reconciler (Judge+M1)", info_rec['latin'], info_rec['hausa'], info_rec['zarma'], highlight=True), unsafe_allow_html=True)
+        st.markdown(render_card(Reconciler, "RECONCILER", info_rec['latin'], info_rec['hausa'], info_rec['zarma'], highlight=True), unsafe_allow_html=True)
     with rec_cols[1]:
-        st.markdown(f"""<div style='background:white; border-left:10px solid {MAROON}; padding:25px; border-radius:15px; box-shadow:0 10px 30px rgba(0,0,0,0.08);'>
-                        <h2 style='margin:0; color:{MAROON}; border:none;'>{info_rec['hausa']} / {info_rec['zarma']} ({info_rec['latin']})</h2>
-                        <p style='font-size:1.2rem; font-weight:bold; color:#2d3436; margin:10px 0;'>{info_rec['rec_insight'][L]}</p>
-                        <hr style='opacity:0.1;'>
-                        <div style='background:#fdf2f2; padding:15px; border:1px dashed {MAROON}; border-radius:10px;'>
-                            <strong style='color:{MAROON};'>{T['rec_title']}:</strong><br>
-                            <span style='font-size:1.1rem; color:#444;'>"{info_rec['recommendation'][L]}"</span>
+        st.markdown(f"""<div style='background:white; border-left:14px solid {MAROON}; padding:35px; border-radius:20px; box-shadow:0 15px 45px rgba(0,0,0,0.12);'>
+                        <h2 style='margin:0; color:{MAROON}; border:none; font-size:2.2rem; font-weight:900;'>{info_rec['hausa']} / {info_rec['zarma']}</h2>
+                        <p style='font-size:0.9rem; color:#888; text-transform:uppercase; letter-spacing:2px;'>{info_rec['latin']}</p>
+                        <p style='font-size:1.5rem; font-weight:800; color:#1a1a1a; margin:15px 0; line-height:1.4;'>{info_rec['rec_insight'][L]}</p>
+                        <hr style='border:1px solid #eee; margin:20px 0;'>
+                        <div style='background:#fdf2f2; padding:25px; border:2px dashed {MAROON}; border-radius:15px;'>
+                            <strong style='color:{MAROON}; font-size:1.2rem; display:block; margin-bottom:8px;'>🔥 {T['rec_title']}:</strong>
+                            <span style='font-size:1.4rem; color:#000; line-height:1.5;'>***"{info_rec['recommendation'][L]}"***</span>
                         </div>
                         </div>""", unsafe_allow_html=True)
