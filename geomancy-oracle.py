@@ -1,10 +1,9 @@
 import streamlit as st
 
-# --- 1. DATA MAP: TRILINGUAL TERMINOLOGY & DYNAMIC SPIRITUAL ACTIONS ---
-# Added "color" key: #2ecc71 (Green) for success/growth, #3498db (Blue) for flow/peace, #16a085 (Teal) for cleansing
+# --- 1. DATA MAP: TRILINGUAL TERMINOLOGY & SPIRITUAL ACTIONS ---
 GEOMANTIC_DATA = {
     (1, 1, 1, 1): {
-        "latin": "Via", "hausa": "Hanya", "zarma": "Fondi", "color": "#3498db",
+        "latin": "Via", "hausa": "Hanya", "zarma": "Fondi",
         "meaning": {"EN": "Change and journeys.", "FR": "Changement et voyages."},
         "rec_insight": {"EN": "The path is open; the spirits of the road clear your way.", "FR": "Le chemin est ouvert ; les esprits de la route dégagent votre voie."},
         "recommendation": {
@@ -13,7 +12,7 @@ GEOMANTIC_DATA = {
         }
     },
     (2, 2, 2, 2): {
-        "latin": "Populus", "hausa": "Jama'a", "zarma": "Boro-boize", "color": "#2ecc71",
+        "latin": "Populus", "hausa": "Jama'a", "zarma": "Boro-boize",
         "meaning": {"EN": "Stability and public matters.", "FR": "Stabilité et affaires publiques."},
         "rec_insight": {"EN": "The community and the 'Doguwa' (Earth spirit) stand behind you.", "FR": "La communauté et la 'Doguwa' (esprit de la terre) vous soutiennent."},
         "recommendation": {
@@ -22,7 +21,7 @@ GEOMANTIC_DATA = {
         }
     },
     (2, 1, 1, 2): {
-        "latin": "Conjunctio", "hausa": "Gama", "zarma": "Marga", "color": "#3498db",
+        "latin": "Conjunctio", "hausa": "Gama", "zarma": "Marga",
         "meaning": {"EN": "Union and joining together.", "FR": "Union et rapprochement."},
         "rec_insight": {"EN": "A spiritual bond is forming; the Zima priest sees a meeting of souls.", "FR": "Un lien spirituel se forme ; le Zima voit une rencontre d'âmes."},
         "recommendation": {
@@ -31,7 +30,7 @@ GEOMANTIC_DATA = {
         }
     },
     (1, 2, 2, 1): {
-        "latin": "Carcer", "hausa": "Sarka", "zarma": "Kase", "color": "#16a085",
+        "latin": "Carcer", "hausa": "Sarka", "zarma": "Kase",
         "meaning": {"EN": "Restriction and delay.", "FR": "Restriction et retard."},
         "rec_insight": {"EN": "A spiritual lock exists. You are under the heavy gaze of Mai-Giro.", "FR": "Un verrou spirituel existe. Vous êtes sous le regard de Mai-Giro."},
         "recommendation": {
@@ -40,7 +39,7 @@ GEOMANTIC_DATA = {
         }
     },
     (2, 2, 1, 1): {
-        "latin": "Fortuna Major", "hausa": "Nasarawa", "zarma": "Izedu Beeri", "color": "#2ecc71",
+        "latin": "Fortuna Major", "hausa": "Nasarawa", "zarma": "Izedu Beeri",
         "meaning": {"EN": "Great fortune and victory.", "FR": "Grande fortune et victoire."},
         "rec_insight": {"EN": "Sarkin Aljan (Spirit King) smiles upon this path.", "FR": "Sarkin Aljan (Le Roi des Esprits) sourit à ce chemin."},
         "recommendation": {
@@ -49,7 +48,7 @@ GEOMANTIC_DATA = {
         }
     },
     (1, 1, 2, 2): {
-        "latin": "Fortuna Minor", "hausa": "Bakin Wata", "zarma": "Izedu Kaina", "color": "#27ae60",
+        "latin": "Fortuna Minor", "hausa": "Bakin Wata", "zarma": "Izedu Kaina",
         "meaning": {"EN": "Small success and swift luck.", "FR": "Petite fortune et chance rapide."},
         "rec_insight": {"EN": "A quick blessing from the 'Holey' spirits is arriving.", "FR": "Une bénédiction rapide des esprits 'Holey' arrive."},
         "recommendation": {
@@ -58,7 +57,7 @@ GEOMANTIC_DATA = {
         }
     },
     (2, 1, 2, 1): {
-        "latin": "Acquisitio", "hausa": "Samu", "zarma": "Samu", "color": "#2ecc71",
+        "latin": "Acquisitio", "hausa": "Samu", "zarma": "Samu",
         "meaning": {"EN": "Profit and gain.", "FR": "Profit et gain."},
         "rec_insight": {"EN": "The river spirits (Harakoy) bring wealth to your bank.", "FR": "Les esprits du fleuve (Harakoy) apportent la richesse."},
         "recommendation": {
@@ -67,7 +66,7 @@ GEOMANTIC_DATA = {
         }
     },
     (1, 2, 1, 2): {
-        "latin": "Amissio", "hausa": "Rashi", "zarma": "Wura", "color": "#16a085",
+        "latin": "Amissio", "hausa": "Rashi", "zarma": "Wura",
         "meaning": {"EN": "Loss and letting go.", "FR": "Perte et lâcher-prise."},
         "rec_insight": {"EN": "The 'bad wind' must be released. Let the current take it.", "FR": "Le 'mauvais vent' doit être libéré. Laissez le courant l'emporter."},
         "recommendation": {
@@ -76,7 +75,7 @@ GEOMANTIC_DATA = {
         }
     },
     (1, 2, 2, 2): {
-        "latin": "Laetitia", "hausa": "Fara'a", "zarma": "Kani-bine", "color": "#2ecc71",
+        "latin": "Laetitia", "hausa": "Fara'a", "zarma": "Kani-bine",
         "meaning": {"EN": "Joy and health.", "FR": "Joie et santé."},
         "rec_insight": {"EN": "The Goge fiddle plays for you; the spirits are dancing.", "FR": "Le violon Goge joue pour vous ; les esprits dansent."},
         "recommendation": {
@@ -85,7 +84,7 @@ GEOMANTIC_DATA = {
         }
     },
     (2, 2, 2, 1): {
-        "latin": "Tristitia", "hausa": "Bakin Ciki", "zarma": "Bine-saray", "color": "#34495e",
+        "latin": "Tristitia", "hausa": "Bakin Ciki", "zarma": "Bine-saray",
         "meaning": {"EN": "Sorrow and depth.", "FR": "Tristesse et profondeur."},
         "rec_insight": {"EN": "The deep spirits of the caves demand heavy focus.", "FR": "Les esprits des grottes exigent une grande concentration."},
         "recommendation": {
@@ -94,7 +93,7 @@ GEOMANTIC_DATA = {
         }
     },
     (1, 2, 1, 1): {
-        "latin": "Puella", "hausa": "Yarinya", "zarma": "Way-boro", "color": "#3498db",
+        "latin": "Puella", "hausa": "Yarinya", "zarma": "Way-boro",
         "meaning": {"EN": "Harmony and grace.", "FR": "Harmonie et grâce."},
         "rec_insight": {"EN": "The female Bori (Moussa) is present.", "FR": "Le Bori féminin (Moussa) est présent."},
         "recommendation": {
@@ -103,7 +102,7 @@ GEOMANTIC_DATA = {
         }
     },
     (1, 1, 2, 1): {
-        "latin": "Puer", "hausa": "Yaro", "zarma": "Izedu-boro", "color": "#2980b9",
+        "latin": "Puer", "hausa": "Yaro", "zarma": "Izedu-boro",
         "meaning": {"EN": "Energy and force.", "FR": "Énergie et force."},
         "rec_insight": {"EN": "Dongo the Thunderer provides the spark. Strike now.", "FR": "Dongo le Tonnerre fournit l'étincelle. Agissez maintenant."},
         "recommendation": {
@@ -112,7 +111,7 @@ GEOMANTIC_DATA = {
         }
     },
     (2, 2, 1, 2): {
-        "latin": "Albus", "hausa": "Fari", "zarma": "Kwaaray", "color": "#3498db",
+        "latin": "Albus", "hausa": "Fari", "zarma": "Kwaaray",
         "meaning": {"EN": "Wisdom and peace.", "FR": "Sagesse et paix."},
         "rec_insight": {"EN": "The 'White Spirits' (Bori Fari) bring a message of truth.", "FR": "Les 'Esprits Blancs' (Bori Fari) apportent la vérité."},
         "recommendation": {
@@ -121,7 +120,7 @@ GEOMANTIC_DATA = {
         }
     },
     (2, 1, 2, 2): {
-        "latin": "Rubeus", "hausa": "Ja", "zarma": "Chirey", "color": "#16a085",
+        "latin": "Rubeus", "hausa": "Ja", "zarma": "Chirey",
         "meaning": {"EN": "Danger and passion.", "FR": "Danger et passion."},
         "rec_insight": {"EN": "The 'Red Winds' blow. Beware of spiritual poison.", "FR": "Les 'Vents Rouges' soufflent. Attention au poison spirituel."},
         "recommendation": {
@@ -130,7 +129,7 @@ GEOMANTIC_DATA = {
         }
     },
     (2, 1, 1, 1): {
-        "latin": "Caput Draconis", "hausa": "Kan Maciji", "zarma": "Dongo-me", "color": "#2ecc71",
+        "latin": "Caput Draconis", "hausa": "Kan Maciji", "zarma": "Dongo-me",
         "meaning": {"EN": "Beginnings and entry.", "FR": "Commencements et entrée."},
         "rec_insight": {"EN": "A new moon cycle begins. The threshold spirits are watching.", "FR": "Un nouveau cycle commence. Les esprits du seuil observent."},
         "recommendation": {
@@ -139,7 +138,7 @@ GEOMANTIC_DATA = {
         }
     },
     (1, 1, 1, 2): {
-        "latin": "Cauda Draconis", "hausa": "Wutsiyar Maciji", "zarma": "Dongo-wanda", "color": "#34495e",
+        "latin": "Cauda Draconis", "hausa": "Wutsiyar Maciji", "zarma": "Dongo-wanda",
         "meaning": {"EN": "Endings and exit.", "FR": "Fins et sortie."},
         "rec_insight": {"EN": "The debt is paid. The old spirits depart.", "FR": "La dette est payée. Les anciens esprits s'en vont."},
         "recommendation": {
@@ -165,6 +164,7 @@ UI_TEXT = {
 }
 
 MAROON = "#800000"
+DARK_BLUE = "#003366"  # Professional Dark Blue for Actions
 
 # --- Functions ---
 def add_figs(f1, f2):
@@ -240,7 +240,7 @@ if st.button(T["btn"], type="primary"):
     for i in range(8):
         info = GEOMANTIC_DATA[tuple(f_data[i])]
         f_cols[i].markdown(render_card(f_data[i], f_labels[i], info['latin'], info['hausa'], info['zarma']), unsafe_allow_html=True)
-        f_cols[i].markdown(f"<div style='font-size:0.9rem; color:{info['color']}; text-align:center; line-height:1.2;'>***{info['recommendation'][L]}***</div>", unsafe_allow_html=True)
+        f_cols[i].markdown(f"<div style='font-size:0.9rem; color:{DARK_BLUE}; text-align:center; line-height:1.2;'><b>{info['recommendation'][L]}</b></div>", unsafe_allow_html=True)
 
     # DISPLAY 2: NEPHEWS
     st.header(T["nephews"])
@@ -249,7 +249,7 @@ if st.button(T["btn"], type="primary"):
     for i in range(4):
         info = GEOMANTIC_DATA[tuple(N_figs[i])]
         n_cols[i].markdown(render_card(N_figs[i], n_labels[i], info['latin'], info['hausa'], info['zarma']), unsafe_allow_html=True)
-        n_cols[i].markdown(f"<div style='font-size:1.0rem; color:{info['color']}; text-align:center; line-height:1.3;'>***{info['recommendation'][L]}***</div>", unsafe_allow_html=True)
+        n_cols[i].markdown(f"<div style='font-size:1.0rem; color:{DARK_BLUE}; text-align:center; line-height:1.3;'><b>{info['recommendation'][L]}</b></div>", unsafe_allow_html=True)
 
     # DISPLAY 3: COURT
     st.header(T["court"])
@@ -265,7 +265,7 @@ if st.button(T["btn"], type="primary"):
         st.markdown(render_card(Judge, "JUDGE", info_j['latin'], info_j['hausa'], info_j['zarma'], highlight=True), unsafe_allow_html=True)
         st.markdown(f"""<div style='background:#fff; border-left:8px solid {MAROON}; padding:20px; border-radius:15px; box-shadow:0 4px 15px rgba(0,0,0,0.08);'>
                         <p style='margin:0; font-weight:900; color:{MAROON}; font-size:1.3rem;'>{info_j['meaning'][L]}</p>
-                        <p style='font-size:1.2rem; color:{info_j['color']}; margin-top:10px;'>🏺 ***{info_j['recommendation'][L]}***</p></div>""", unsafe_allow_html=True)
+                        <p style='font-size:1.2rem; color:{DARK_BLUE}; margin-top:10px;'>🏺 <b>{info_j['recommendation'][L]}</b></p></div>""", unsafe_allow_html=True)
 
     # DISPLAY 4: RECONCILER
     st.header(T["reconciler"])
@@ -281,6 +281,6 @@ if st.button(T["btn"], type="primary"):
                         <hr style='border:1px solid #eee; margin:20px 0;'>
                         <div style='background:#fdf2f2; padding:25px; border:2px dashed {MAROON}; border-radius:15px;'>
                             <strong style='color:{MAROON}; font-size:1.2rem; display:block; margin-bottom:8px;'>🔥 {T['rec_title']}:</strong>
-                            <span style='font-size:1.5rem; color:{info_rec['color']}; line-height:1.5;'>***"{info_rec['recommendation'][L]}"***</span>
+                            <span style='font-size:1.5rem; color:{DARK_BLUE}; line-height:1.5;'><b>"{info_rec['recommendation'][L]}"</b></span>
                         </div>
                         </div>""", unsafe_allow_html=True)
