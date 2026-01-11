@@ -148,158 +148,147 @@ GEOMANTIC_DATA = {
     }
 }
 
-HOUSE_METADATA = {
-    1: {"EN": "Life, Soul & Persona", "FR": "Vie, Âme et Personnalité"},
-    2: {"EN": "Wealth & Assets", "FR": "Richesse et Biens"},
-    3: {"EN": "Communication & Siblings", "FR": "Communication et Fratrie"},
-    4: {"EN": "The Home & Ancestry", "FR": "Foyer et Ascendance"},
-    5: {"EN": "Creativity & Children", "FR": "Créativité et Enfants"},
-    6: {"EN": "Service & Health", "FR": "Service et Santé"},
-    7: {"EN": "Partnership & Marriage", "FR": "Partenariat et Mariage"},
-    8: {"EN": "Transformation & Debt", "FR": "Transformation et Dettes"},
-    9: {"EN": "Wisdom & Journeys", "FR": "Sagesse et Voyages"},
-    10: {"EN": "Honor & Career", "FR": "Honneur et Carrière"},
-    11: {"EN": "Friends & Hopes", "FR": "Amis et Espoirs"},
-    12: {"EN": "Subconscious & Solitude", "FR": "Inconscient et Solitude"}
-}
-
 UI_TEXT = {
     "EN": {
-        "title": "Maroon Oracle", "subtitle": "Hausa & Songhay Divination", "btn": "Unlock the Twelve Houses",
-        "reset": "Reset Oracle", "houses": "I. The Twelve Houses of Existence",
-        "court": "II. The Court of Finality", "reconciler": "III. The Great Reconciler",
-        "rec_title": "Spiritual Sadaka Required", "error": "All 4 Mothers must be entered."
+        "title": "Maroon Oracle", "subtitle": "Hausa & Songhay Divination", "btn": "Generate Full Shield",
+        "reset": "Reset All", "foundations": "1. Foundations (Mothers & Daughters)", "nephews": "2. The Nephews",
+        "court": "3. The Court (Witnesses & Judge)", "reconciler": "4. The Reconciler (Final Synthesis)",
+        "rec_title": "Spiritual Sadaka Required", "error": "Please fill all fields."
     },
     "FR": {
-        "title": "L'Oracle Marron", "subtitle": "Divination Haoussa & Songhaï", "btn": "Déverrouiller les Douze Maisons",
-        "reset": "Réinitialiser", "houses": "I. Les Douze Maisons de l'Existence",
-        "court": "II. La Cour de Finalité", "reconciler": "III. Le Grand Réconciliateur",
-        "rec_title": "Sadaka Spirituelle Requise", "error": "Les 4 Mères doivent être remplies."
+        "title": "L'Oracle Marron", "subtitle": "Divination Haoussa & Songhaï", "btn": "Générer le Blason",
+        "reset": "Réinitialiser", "foundations": "1. Fondations (Mères & Filles)", "nephews": "2. Les Neveux",
+        "court": "3. La Cour (Témoins & Juge)", "reconciler": "4. Le Réconciliateur (Synthèse Finale)",
+        "rec_title": "Sadaka Spirituelle Requise", "error": "Veuillez remplir tous les champs."
     }
 }
 
 MAROON = "#800000"
-GOLD = "#D4AF37"
-DARK_BLUE = "#001F3F"
+DARK_BLUE = "#003366"
 
-# --- Logic Functions ---
+# --- Functions ---
 def add_figs(f1, f2):
     return [2 if (r1 + r2) % 2 == 0 else 1 for r1, r2 in zip(f1, f2)]
+
+def render_card(fig, label, latin, hausa, zarma, color=MAROON, highlight=False):
+    border = f"4px solid {color}" if highlight else "1px solid #edf0f2"
+    shadow = f"0 15px 40px {color}33" if highlight else "0 6px 18px rgba(0,0,0,0.06)"
+    
+    # Original Circular Dots
+    rows = "".join([f"<div style='font-size: 30px; color: {color}; line-height: 0.9; margin: 2px 0;'>{'●' if r == 1 else '●&nbsp;&nbsp;●'}</div>" for r in fig])
+    
+    # Traditional Dot-Dash (Compact & Black)
+    compact_rows = "".join([f"<div style='font-size: 16px; color: black; line-height: 0.8; font-weight: bold;'>{'&bull;' if r == 1 else '&mdash;'}</div>" for r in fig])
+    
+    return f"""
+    <div style="background: white; border: {border}; border-radius: 18px; padding: 15px; text-align: center; box-shadow: {shadow}; margin-bottom: 12px; position: relative;">
+        <div style="font-size: 0.65rem; color: #a0a0a0; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">{label}</div>
+        <div style="display: flex; justify-content: center; align-items: center; gap: 15px; margin: 10px 0;">
+            <div>{rows}</div>
+            <div style="border-left: 1px solid #eee; padding-left: 12px; height: 60px; display: flex; flex-direction: column; justify-content: center;">{compact_rows}</div>
+        </div>
+        <div style="font-size: 1.0rem; font-weight: 900; color: #111; margin-top: 5px;">{latin}</div>
+        <div style="font-size: 0.85rem; color: {color}; font-weight: 700;">{hausa} / {zarma}</div>
+    </div>
+    """
 
 def process_input(s):
     clean = s.replace(" ", "")
     return (1 if len(clean) % 2 != 0 else 2) if clean else None
 
-def render_house_card(fig, h_num, info, lang):
-    """Refined UI for individual houses"""
-    meta = HOUSE_METADATA[h_num][lang]
-    dots = "".join([f"<div style='font-size: 24px; color: {MAROON}; line-height: 0.7; margin: 4px 0;'>{'●' if r == 1 else '●&nbsp;&nbsp;●'}</div>" for r in fig])
-    
-    return f"""
-    <div style="background: white; border-top: 5px solid {MAROON}; border-radius: 12px; padding: 15px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08); margin-bottom: 20px;">
-        <div style="font-size: 0.7rem; color: #888; font-weight: 800; letter-spacing: 1px;">HOUSE {h_num}</div>
-        <div style="font-size: 0.85rem; color: {DARK_BLUE}; font-weight: 700; margin-bottom: 8px; height: 35px;">{meta}</div>
-        <div style="margin: 15px 0;">{dots}</div>
-        <div style="font-size: 1.1rem; font-weight: 900; color: #111;">{info['hausa']}</div>
-        <div style="font-size: 0.7rem; color: #666; font-style: italic;">({info['latin']})</div>
-    </div>
-    """
-
-# --- App Config ---
+# --- UI Layout ---
 st.set_page_config(page_title="Maroon Oracle", layout="wide")
 st.markdown(f"""<style>
-    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700;900&display=swap');
-    html, body, [data-testid="stAppViewContainer"] {{ background-color: #fdfcfb; font-family: 'Outfit', sans-serif; }}
-    .stButton>button {{ background: linear-gradient(135deg, {MAROON}, #a00000) !important; color: white !important; border-radius: 10px !important; font-weight: 800 !important; letter-spacing: 1px; }}
-    h1 {{ font-weight: 900; letter-spacing: -1px; color: {DARK_BLUE} !important; }}
-    h2 {{ color: {MAROON} !important; font-weight: 800; border-left: 5px solid {GOLD}; padding-left: 15px; }}
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;800;900&display=swap');
+    html, body, [data-testid="stAppViewContainer"] {{ background-color: #f8fafc; font-family: 'Outfit', sans-serif; }}
+    h1 {{ font-weight: 900; color: #1e272e !important; text-align: center; font-size: 3rem !important; }}
+    h2 {{ color: {MAROON} !important; border-bottom: 3px solid {MAROON}22; padding-bottom: 8px; margin-top: 35px; font-size: 1.8rem; font-weight: 800; }}
+    .stButton>button {{ background: {MAROON} !important; color: white !important; border-radius: 15px !important; height: 60px !important; width: 100%; font-size: 1.2rem !important; font-weight: 800 !important; }}
     </style>""", unsafe_allow_html=True)
 
 # SIDEBAR
-lang_choice = st.sidebar.radio("Language", ["English", "Français"])
+lang_choice = st.sidebar.selectbox("🌐 Language", ["English", "Français"])
 L = "EN" if lang_choice == "English" else "FR"
 T = UI_TEXT[L]
 if st.sidebar.button(T["reset"]): st.rerun()
 
-# HEADER
-st.title(f"🏺 {T['title']}")
-st.markdown(f"<p style='text-align: center; color: #555; font-size: 1.2rem; margin-top: -20px;'>{T['subtitle']}</p>", unsafe_allow_html=True)
+st.title(T["title"])
+st.markdown(f"<p style='text-align: center; color: #666; margin-top:-20px; font-size: 1.2rem;'>{T['subtitle']}</p>", unsafe_allow_html=True)
 
-# INPUT AREA
-st.markdown("---")
+# INPUT SECTION
+st.markdown("<br>", unsafe_allow_html=True)
 m_cols = st.columns(4)
 mothers_input = []
 for i in range(4):
     with m_cols[i]:
-        st.markdown(f"<div style='text-align:center; font-weight:900; color:{MAROON};'>MOTHER {i+1}</div>", unsafe_allow_html=True)
+        st.markdown(f"<div style='text-align:center; font-weight:900; font-size:1.2rem; color:#444; margin-bottom:10px;'>M{i+1}</div>", unsafe_allow_html=True)
         m_rows = [st.text_input(f"M{i+1}L{j+1}", key=f"m{i}r{j}", label_visibility="collapsed", placeholder="••••") for j in range(4)]
         mothers_input.append(m_rows)
 
-if st.button(T["btn"], use_container_width=True):
-    # Core Logic
+if st.button(T["btn"], type="primary"):
     M_figs = []
     for rows in mothers_input:
         proc = [process_input(r) for r in rows]
         if None in proc: st.error(T["error"]); st.stop()
         M_figs.append(proc)
     
-    # Generate the 12 Houses
     D_figs = [[M_figs[j][i] for j in range(4)] for i in range(4)]
     N_figs = [add_figs(M_figs[0], M_figs[1]), add_figs(M_figs[2], M_figs[3]), 
               add_figs(D_figs[0], D_figs[1]), add_figs(D_figs[2], D_figs[3])]
-    
-    # Full list for indexing Houses 1-12
-    HOUSES = M_figs + D_figs + N_figs
-    
-    # Witnesses and Judge
     RW = add_figs(N_figs[0], N_figs[1])
     LW = add_figs(N_figs[2], N_figs[3])
     Judge = add_figs(RW, LW)
     Reconciler = add_figs(Judge, M_figs[0])
 
-    # DISPLAY 1: TWELVE HOUSES
-    st.header(T["houses"])
-    h_grid = st.columns(4)
-    for i in range(12):
-        with h_grid[i % 4]:
-            info = GEOMANTIC_DATA[tuple(HOUSES[i])]
-            st.markdown(render_house_card(HOUSES[i], i+1, info, L), unsafe_allow_html=True)
+    # DISPLAY 1: FOUNDATIONS
+    st.header(T["foundations"])
+    f_cols = st.columns(8)
+    f_labels = ["M1", "M2", "M3", "M4", "D1", "D2", "D3", "D4"]
+    f_data = M_figs + D_figs
+    for i in range(8):
+        info = GEOMANTIC_DATA[tuple(f_data[i])]
+        f_cols[i].markdown(render_card(f_data[i], f_labels[i], info['latin'], info['hausa'], info['zarma']), unsafe_allow_html=True)
+        f_cols[i].markdown(f"<div style='font-size:0.85rem; color:{DARK_BLUE}; text-align:center; line-height:1.2;'><b>{info['recommendation'][L]}</b></div>", unsafe_allow_html=True)
 
-    # DISPLAY 2: THE COURT
+    # DISPLAY 2: NEPHEWS
+    st.header(T["nephews"])
+    n_cols = st.columns(4)
+    n_labels = ["N1", "N2", "N3", "N4"]
+    for i in range(4):
+        info = GEOMANTIC_DATA[tuple(N_figs[i])]
+        n_cols[i].markdown(render_card(N_figs[i], n_labels[i], info['latin'], info['hausa'], info['zarma']), unsafe_allow_html=True)
+        n_cols[i].markdown(f"<div style='font-size:0.95rem; color:{DARK_BLUE}; text-align:center; line-height:1.3;'><b>{info['recommendation'][L]}</b></div>", unsafe_allow_html=True)
+
+    # DISPLAY 3: COURT
     st.header(T["court"])
     c_cols = st.columns([1, 1, 2])
-    
     with c_cols[0]:
         info_rw = GEOMANTIC_DATA[tuple(RW)]
-        st.markdown(f"<div style='text-align:center; padding:10px; border:1px solid #ddd; border-radius:10px;'><strong>Right Witness</strong><br>{info_rw['hausa']}</div>", unsafe_allow_html=True)
-        st.markdown(render_house_card(RW, "RW", info_rw, L), unsafe_allow_html=True)
+        st.markdown(render_card(RW, "RW", info_rw['latin'], info_rw['hausa'], info_rw['zarma']), unsafe_allow_html=True)
     with c_cols[1]:
         info_lw = GEOMANTIC_DATA[tuple(LW)]
-        st.markdown(f"<div style='text-align:center; padding:10px; border:1px solid #ddd; border-radius:10px;'><strong>Left Witness</strong><br>{info_lw['hausa']}</div>", unsafe_allow_html=True)
-        st.markdown(render_house_card(LW, "LW", info_lw, L), unsafe_allow_html=True)
+        st.markdown(render_card(LW, "LW", info_lw['latin'], info_lw['hausa'], info_lw['zarma']), unsafe_allow_html=True)
     with c_cols[2]:
         info_j = GEOMANTIC_DATA[tuple(Judge)]
-        st.markdown(f"""<div style='background:{DARK_BLUE}; color:white; padding:30px; border-radius:15px; border-bottom: 8px solid {GOLD};'>
-                        <h3 style='margin:0; color:{GOLD};'>THE JUDGE: {info_j['hausa']}</h3>
-                        <p style='font-size:1.2rem; line-height:1.4;'>{info_j['meaning'][L]}</p>
-                        <div style='margin-top:20px; padding:15px; background:rgba(255,255,255,0.1); border-radius:8px;'>
-                            <strong>⚖️ Guidance:</strong> {info_j['recommendation'][L]}
-                        </div>
-                    </div>""", unsafe_allow_html=True)
+        st.markdown(render_card(Judge, "JUDGE", info_j['latin'], info_j['hausa'], info_j['zarma'], highlight=True), unsafe_allow_html=True)
+        st.markdown(f"""<div style='background:#fff; border-left:8px solid {MAROON}; padding:20px; border-radius:15px; box-shadow:0 4px 15px rgba(0,0,0,0.08);'>
+                        <p style='margin:0; font-weight:900; color:{MAROON}; font-size:1.3rem;'>{info_j['meaning'][L]}</p>
+                        <p style='font-size:1.2rem; color:{DARK_BLUE}; margin-top:10px;'>🏺 <b>{info_j['recommendation'][L]}</b></p></div>""", unsafe_allow_html=True)
 
-    # DISPLAY 3: RECONCILER
+    # DISPLAY 4: RECONCILER
     st.header(T["reconciler"])
+    rec_cols = st.columns([1, 3])
     info_rec = GEOMANTIC_DATA[tuple(Reconciler)]
-    st.markdown(f"""<div style='background:white; border:2px solid {MAROON}; border-radius:20px; overflow:hidden; box-shadow:0 20px 50px rgba(0,0,0,0.1);'>
-                    <div style='background:{MAROON}; color:white; padding:20px; text-align:center;'>
-                        <h1 style='color:{GOLD} !important; margin:0;'>{info_rec['hausa']} / {info_rec['zarma']}</h1>
-                        <span style='text-transform:uppercase; letter-spacing:3px; font-size:0.8rem;'>{info_rec['latin']}</span>
-                    </div>
-                    <div style='padding:40px;'>
-                        <p style='font-size:1.6rem; font-weight:700; color:{DARK_BLUE}; text-align:center;'>"{info_rec['rec_insight'][L]}"</p>
-                        <div style='margin-top:30px; background:#fff9f9; padding:30px; border-radius:15px; border: 1px dashed {MAROON};'>
-                            <h4 style='color:{MAROON}; margin-top:0;'>🔥 {T['rec_title']}</h4>
-                            <p style='font-size:1.3rem; color:#333; font-weight:600;'>{info_rec['recommendation'][L]}</p>
+    with rec_cols[0]:
+        st.markdown(render_card(Reconciler, "RECONCILER", info_rec['latin'], info_rec['hausa'], info_rec['zarma'], highlight=True), unsafe_allow_html=True)
+    with rec_cols[1]:
+        st.markdown(f"""<div style='background:white; border-left:14px solid {MAROON}; padding:35px; border-radius:20px; box-shadow:0 15px 45px rgba(0,0,0,0.12);'>
+                        <h2 style='margin:0; color:{MAROON}; border:none; font-size:2.2rem; font-weight:900;'>{info_rec['hausa']} / {info_rec['zarma']}</h2>
+                        <p style='font-size:0.9rem; color:#888; text-transform:uppercase; letter-spacing:2px;'>{info_rec['latin']}</p>
+                        <p style='font-size:1.5rem; font-weight:800; color:#1a1a1a; margin:15px 0; line-height:1.4;'>{info_rec['rec_insight'][L]}</p>
+                        <hr style='border:1px solid #eee; margin:20px 0;'>
+                        <div style='background:#fdf2f2; padding:25px; border:2px dashed {MAROON}; border-radius:15px;'>
+                            <strong style='color:{MAROON}; font-size:1.2rem; display:block; margin-bottom:8px;'>🔥 {T['rec_title']}:</strong>
+                            <span style='font-size:1.5rem; color:{DARK_BLUE}; line-height:1.5;'><b>"{info_rec['recommendation'][L]}"</b></span>
                         </div>
-                    </div>
-                </div>""", unsafe_allow_html=True)
+                        </div>""", unsafe_allow_html=True)
