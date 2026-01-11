@@ -148,31 +148,16 @@ GEOMANTIC_DATA = {
     }
 }
 
-HOUSE_MEANINGS = {
-    1: {"EN": "Life, Soul, & Body", "FR": "Vie, Âme et Corps"},
-    2: {"EN": "Wealth, Money, & Gain", "FR": "Richesse, Argent et Gain"},
-    3: {"EN": "Siblings, Short Trips, & News", "FR": "Fratrie, Courts Voyages et Nouvelles"},
-    4: {"EN": "Father, Home, & Ancestry", "FR": "Père, Foyer et Ascendance"},
-    5: {"EN": "Children, Joy, & Creativity", "FR": "Enfants, Joie et Créativité"},
-    6: {"EN": "Sickness, Service, & Work", "FR": "Maladie, Service et Travail"},
-    7: {"EN": "Marriage, Partners, & Open Enemies", "FR": "Mariage, Partenaires et Ennemis Ouverts"},
-    8: {"EN": "Death, Inheritances, & Hidden Things", "FR": "Mort, Héritages et Choses Cachées"},
-    9: {"EN": "Religion, Long Journeys, & Wisdom", "FR": "Religion, Longs Voyages et Sagesse"},
-    10: {"EN": "Power, Career, & Success", "FR": "Pouvoir, Carrière et Succès"},
-    11: {"EN": "Friends, Hopes, & Desires", "FR": "Amis, Espoirs et Désirs"},
-    12: {"EN": "Prison, Secret Enemies, & Sorrow", "FR": "Prison, Ennemis Secrets et Tristesse"}
-}
-
 UI_TEXT = {
     "EN": {
         "title": "Maroon Oracle", "subtitle": "Hausa & Songhay Divination", "btn": "Generate Full Shield",
-        "reset": "Reset All", "foundations": "1. Foundations (Mothers & Daughters)", "houses": "2. The Twelve Houses",
+        "reset": "Reset All", "foundations": "1. Foundations (Mothers & Daughters)", "nephews": "2. The Nephews",
         "court": "3. The Court (Witnesses & Judge)", "reconciler": "4. The Reconciler (Final Synthesis)",
         "rec_title": "Spiritual Sadaka Required", "error": "Please fill all fields."
     },
     "FR": {
         "title": "L'Oracle Marron", "subtitle": "Divination Haoussa & Songhaï", "btn": "Générer le Blason",
-        "reset": "Réinitialiser", "foundations": "1. Fondations (Mères & Filles)", "houses": "2. Les Douze Maisons",
+        "reset": "Réinitialiser", "foundations": "1. Fondations (Mères & Filles)", "nephews": "2. Les Neveux",
         "court": "3. La Cour (Témoins & Juge)", "reconciler": "4. Le Réconciliateur (Synthèse Finale)",
         "rec_title": "Sadaka Spirituelle Requise", "error": "Veuillez remplir tous les champs."
     }
@@ -185,19 +170,23 @@ DARK_BLUE = "#003366"
 def add_figs(f1, f2):
     return [2 if (r1 + r2) % 2 == 0 else 1 for r1, r2 in zip(f1, f2)]
 
-def render_card(fig, label, latin, hausa, zarma, color=MAROON, highlight=False, sub_label=None):
+def render_card(fig, label, latin, hausa, zarma, color=MAROON, highlight=False):
     border = f"4px solid {color}" if highlight else "1px solid #edf0f2"
     shadow = f"0 15px 40px {color}33" if highlight else "0 6px 18px rgba(0,0,0,0.06)"
     
-    rows = "".join([f"<div style='font-size: 26px; color: {color}; line-height: 0.8; margin: 2px 0;'>{'●' if r == 1 else '●&nbsp;&nbsp;●'}</div>" for r in fig])
+    # Original Circular Dots
+    rows = "".join([f"<div style='font-size: 30px; color: {color}; line-height: 0.9; margin: 2px 0;'>{'●' if r == 1 else '●&nbsp;&nbsp;●'}</div>" for r in fig])
     
-    sub_html = f"<div style='font-size: 0.7rem; color: #777; font-weight: bold; margin-bottom: 5px;'>{sub_label}</div>" if sub_label else ""
+    # Traditional Dot-Dash (Compact & Black)
+    compact_rows = "".join([f"<div style='font-size: 16px; color: black; line-height: 0.8; font-weight: bold;'>{'&bull;' if r == 1 else '&mdash;'}</div>" for r in fig])
     
     return f"""
-    <div style="background: white; border: {border}; border-radius: 18px; padding: 15px; text-align: center; box-shadow: {shadow}; margin-bottom: 12px;">
+    <div style="background: white; border: {border}; border-radius: 18px; padding: 15px; text-align: center; box-shadow: {shadow}; margin-bottom: 12px; position: relative;">
         <div style="font-size: 0.65rem; color: #a0a0a0; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">{label}</div>
-        {sub_html}
-        <div style="margin: 10px 0;">{rows}</div>
+        <div style="display: flex; justify-content: center; align-items: center; gap: 15px; margin: 10px 0;">
+            <div>{rows}</div>
+            <div style="border-left: 1px solid #eee; padding-left: 12px; height: 60px; display: flex; flex-direction: column; justify-content: center;">{compact_rows}</div>
+        </div>
         <div style="font-size: 1.0rem; font-weight: 900; color: #111; margin-top: 5px;">{latin}</div>
         <div style="font-size: 0.85rem; color: {color}; font-weight: 700;">{hausa} / {zarma}</div>
     </div>
@@ -246,16 +235,12 @@ if st.button(T["btn"], type="primary"):
     D_figs = [[M_figs[j][i] for j in range(4)] for i in range(4)]
     N_figs = [add_figs(M_figs[0], M_figs[1]), add_figs(M_figs[2], M_figs[3]), 
               add_figs(D_figs[0], D_figs[1]), add_figs(D_figs[2], D_figs[3])]
-    
-    # 12 Houses Mapping: H1-4(M), H5-8(D), H9-12(N)
-    HOUSES = M_figs + D_figs + N_figs
-    
     RW = add_figs(N_figs[0], N_figs[1])
     LW = add_figs(N_figs[2], N_figs[3])
     Judge = add_figs(RW, LW)
     Reconciler = add_figs(Judge, M_figs[0])
 
-    # DISPLAY 1: FOUNDATIONS (Mothers & Daughters)
+    # DISPLAY 1: FOUNDATIONS
     st.header(T["foundations"])
     f_cols = st.columns(8)
     f_labels = ["M1", "M2", "M3", "M4", "D1", "D2", "D3", "D4"]
@@ -263,18 +248,16 @@ if st.button(T["btn"], type="primary"):
     for i in range(8):
         info = GEOMANTIC_DATA[tuple(f_data[i])]
         f_cols[i].markdown(render_card(f_data[i], f_labels[i], info['latin'], info['hausa'], info['zarma']), unsafe_allow_html=True)
+        f_cols[i].markdown(f"<div style='font-size:0.85rem; color:{DARK_BLUE}; text-align:center; line-height:1.2;'><b>{info['recommendation'][L]}</b></div>", unsafe_allow_html=True)
 
-    # DISPLAY 2: THE TWELVE HOUSES
-    st.header(T["houses"])
-    h_row1 = st.columns(4)
-    h_row2 = st.columns(4)
-    h_row3 = st.columns(4)
-    all_h_cols = h_row1 + h_row2 + h_row3
-    
-    for i in range(12):
-        info = GEOMANTIC_DATA[tuple(HOUSES[i])]
-        h_meaning = HOUSE_MEANINGS[i+1][L]
-        all_h_cols[i].markdown(render_card(HOUSES[i], f"House {i+1}", info['latin'], info['hausa'], info['zarma'], sub_label=h_meaning), unsafe_allow_html=True)
+    # DISPLAY 2: NEPHEWS
+    st.header(T["nephews"])
+    n_cols = st.columns(4)
+    n_labels = ["N1", "N2", "N3", "N4"]
+    for i in range(4):
+        info = GEOMANTIC_DATA[tuple(N_figs[i])]
+        n_cols[i].markdown(render_card(N_figs[i], n_labels[i], info['latin'], info['hausa'], info['zarma']), unsafe_allow_html=True)
+        n_cols[i].markdown(f"<div style='font-size:0.95rem; color:{DARK_BLUE}; text-align:center; line-height:1.3;'><b>{info['recommendation'][L]}</b></div>", unsafe_allow_html=True)
 
     # DISPLAY 3: COURT
     st.header(T["court"])
