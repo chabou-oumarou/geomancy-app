@@ -148,17 +148,32 @@ GEOMANTIC_DATA = {
     }
 }
 
+HOUSE_MEANINGS = {
+    1: {"EN": "Life, Soul & Body", "FR": "Vie, Âme & Corps"},
+    2: {"EN": "Wealth & Assets", "FR": "Richesse & Biens"},
+    3: {"EN": "Siblings & Communication", "FR": "Frères & Communication"},
+    4: {"EN": "The Father & Home", "FR": "Le Père & Le Foyer"},
+    5: {"EN": "Children & Pleasure", "FR": "Enfants & Plaisir"},
+    6: {"EN": "Sickness & Servitude", "FR": "Maladie & Servitude"},
+    7: {"EN": "Marriage & Partners", "FR": "Mariage & Partenaires"},
+    8: {"EN": "Death & Inheritance", "FR": "Mort & Héritage"},
+    9: {"EN": "Journeys & Religion", "FR": "Voyages & Religion"},
+    10: {"EN": "Power & Glory", "FR": "Pouvoir & Gloire"},
+    11: {"EN": "Friends & Hopes", "FR": "Amis & Espoirs"},
+    12: {"EN": "Secret Enemies & Prison", "FR": "Ennemis Secrets & Prison"}
+}
+
 UI_TEXT = {
     "EN": {
         "title": "Maroon Oracle", "subtitle": "Hausa & Songhay Divination", "btn": "Generate Full Shield",
-        "reset": "Reset All", "foundations": "1. Foundations (Mothers & Daughters)", "nephews": "2. The Nephews",
-        "court": "3. The Court (Witnesses & Judge)", "reconciler": "4. The Reconciler (Final Synthesis)",
+        "reset": "Reset All", "houses": "The Twelve Houses of Life",
+        "court": "The Court (Witnesses & Judge)", "reconciler": "Final Synthesis",
         "rec_title": "Spiritual Sadaka Required", "error": "Please fill all fields."
     },
     "FR": {
         "title": "L'Oracle Marron", "subtitle": "Divination Haoussa & Songhaï", "btn": "Générer le Blason",
-        "reset": "Réinitialiser", "foundations": "1. Fondations (Mères & Filles)", "nephews": "2. Les Neveux",
-        "court": "3. La Cour (Témoins & Juge)", "reconciler": "4. Le Réconciliateur (Synthèse Finale)",
+        "reset": "Réinitialiser", "houses": "Les Douze Maisons de la Vie",
+        "court": "La Cour (Témoins & Juge)", "reconciler": "Synthèse Finale",
         "rec_title": "Sadaka Spirituelle Requise", "error": "Veuillez remplir tous les champs."
     }
 }
@@ -170,25 +185,21 @@ DARK_BLUE = "#003366"
 def add_figs(f1, f2):
     return [2 if (r1 + r2) % 2 == 0 else 1 for r1, r2 in zip(f1, f2)]
 
-def render_card(fig, label, latin, hausa, zarma, color=MAROON, highlight=False):
+def render_card(fig, label, latin, hausa, zarma, house_text="", color=MAROON, highlight=False):
     border = f"4px solid {color}" if highlight else "1px solid #edf0f2"
     shadow = f"0 15px 40px {color}33" if highlight else "0 6px 18px rgba(0,0,0,0.06)"
     
-    # Original Circular Dots
-    rows = "".join([f"<div style='font-size: 30px; color: {color}; line-height: 0.9; margin: 2px 0;'>{'●' if r == 1 else '●&nbsp;&nbsp;●'}</div>" for r in fig])
+    rows = "".join([f"<div style='font-size: 26px; color: {color}; line-height: 0.8; margin: 2px 0;'>{'●' if r == 1 else '●&nbsp;&nbsp;●'}</div>" for r in fig])
     
-    # Traditional Dot-Dash (Compact & Black)
-    compact_rows = "".join([f"<div style='font-size: 16px; color: black; line-height: 0.8; font-weight: bold;'>{'&bull;' if r == 1 else '&mdash;'}</div>" for r in fig])
+    house_html = f"<div style='font-size: 0.7rem; color: #777; font-weight: bold; margin-bottom: 5px;'>{house_text}</div>" if house_text else ""
     
     return f"""
-    <div style="background: white; border: {border}; border-radius: 18px; padding: 15px; text-align: center; box-shadow: {shadow}; margin-bottom: 12px; position: relative;">
-        <div style="font-size: 0.65rem; color: #a0a0a0; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">{label}</div>
-        <div style="display: flex; justify-content: center; align-items: center; gap: 15px; margin: 10px 0;">
-            <div>{rows}</div>
-            <div style="border-left: 1px solid #eee; padding-left: 12px; height: 60px; display: flex; flex-direction: column; justify-content: center;">{compact_rows}</div>
-        </div>
-        <div style="font-size: 1.0rem; font-weight: 900; color: #111; margin-top: 5px;">{latin}</div>
-        <div style="font-size: 0.85rem; color: {color}; font-weight: 700;">{hausa} / {zarma}</div>
+    <div style="background: white; border: {border}; border-radius: 15px; padding: 12px; text-align: center; box-shadow: {shadow}; margin-bottom: 10px;">
+        <div style="font-size: 0.6rem; color: #aaa; font-weight: 800; text-transform: uppercase;">{label}</div>
+        {house_html}
+        <div style="margin: 8px 0;">{rows}</div>
+        <div style="font-size: 0.9rem; font-weight: 900; color: #111;">{latin}</div>
+        <div style="font-size: 0.75rem; color: {color}; font-weight: 700;">{hausa}</div>
     </div>
     """
 
@@ -226,6 +237,7 @@ for i in range(4):
         mothers_input.append(m_rows)
 
 if st.button(T["btn"], type="primary"):
+    # Generate Figures
     M_figs = []
     for rows in mothers_input:
         proc = [process_input(r) for r in rows]
@@ -235,60 +247,53 @@ if st.button(T["btn"], type="primary"):
     D_figs = [[M_figs[j][i] for j in range(4)] for i in range(4)]
     N_figs = [add_figs(M_figs[0], M_figs[1]), add_figs(M_figs[2], M_figs[3]), 
               add_figs(D_figs[0], D_figs[1]), add_figs(D_figs[2], D_figs[3])]
+    
+    # Mapping Houses 1-12
+    # H1-4: Mothers, H5-8: Daughters, H9-12: Nephews
+    HOUSES = M_figs + D_figs + N_figs
+    
     RW = add_figs(N_figs[0], N_figs[1])
     LW = add_figs(N_figs[2], N_figs[3])
     Judge = add_figs(RW, LW)
     Reconciler = add_figs(Judge, M_figs[0])
 
-    # DISPLAY 1: FOUNDATIONS
-    st.header(T["foundations"])
-    f_cols = st.columns(8)
-    f_labels = ["M1", "M2", "M3", "M4", "D1", "D2", "D3", "D4"]
-    f_data = M_figs + D_figs
-    for i in range(8):
-        info = GEOMANTIC_DATA[tuple(f_data[i])]
-        f_cols[i].markdown(render_card(f_data[i], f_labels[i], info['latin'], info['hausa'], info['zarma']), unsafe_allow_html=True)
-        f_cols[i].markdown(f"<div style='font-size:0.85rem; color:{DARK_BLUE}; text-align:center; line-height:1.2;'><b>{info['recommendation'][L]}</b></div>", unsafe_allow_html=True)
+    # DISPLAY 1: THE 12 HOUSES
+    st.header(T["houses"])
+    h_rows = [st.columns(4) for _ in range(3)]
+    for i in range(12):
+        col_idx = i % 4
+        row_idx = i // 4
+        info = GEOMANTIC_DATA[tuple(HOUSES[i])]
+        h_label = f"House {i+1}"
+        h_meaning = HOUSE_MEANINGS[i+1][L]
+        h_rows[row_idx][col_idx].markdown(render_card(HOUSES[i], h_label, info['latin'], info['hausa'], info['zarma'], house_text=h_meaning), unsafe_allow_html=True)
 
-    # DISPLAY 2: NEPHEWS
-    st.header(T["nephews"])
-    n_cols = st.columns(4)
-    n_labels = ["N1", "N2", "N3", "N4"]
-    for i in range(4):
-        info = GEOMANTIC_DATA[tuple(N_figs[i])]
-        n_cols[i].markdown(render_card(N_figs[i], n_labels[i], info['latin'], info['hausa'], info['zarma']), unsafe_allow_html=True)
-        n_cols[i].markdown(f"<div style='font-size:0.95rem; color:{DARK_BLUE}; text-align:center; line-height:1.3;'><b>{info['recommendation'][L]}</b></div>", unsafe_allow_html=True)
-
-    # DISPLAY 3: COURT
+    # DISPLAY 2: COURT
     st.header(T["court"])
     c_cols = st.columns([1, 1, 2])
     with c_cols[0]:
         info_rw = GEOMANTIC_DATA[tuple(RW)]
-        st.markdown(render_card(RW, "RW", info_rw['latin'], info_rw['hausa'], info_rw['zarma']), unsafe_allow_html=True)
+        st.markdown(render_card(RW, "Right Witness", info_rw['latin'], info_rw['hausa'], info_rw['zarma']), unsafe_allow_html=True)
     with c_cols[1]:
         info_lw = GEOMANTIC_DATA[tuple(LW)]
-        st.markdown(render_card(LW, "LW", info_lw['latin'], info_lw['hausa'], info_lw['zarma']), unsafe_allow_html=True)
+        st.markdown(render_card(LW, "Left Witness", info_lw['latin'], info_lw['hausa'], info_lw['zarma']), unsafe_allow_html=True)
     with c_cols[2]:
         info_j = GEOMANTIC_DATA[tuple(Judge)]
-        st.markdown(render_card(Judge, "JUDGE", info_j['latin'], info_j['hausa'], info_j['zarma'], highlight=True), unsafe_allow_html=True)
+        st.markdown(render_card(Judge, "THE JUDGE", info_j['latin'], info_j['hausa'], info_j['zarma'], highlight=True), unsafe_allow_html=True)
         st.markdown(f"""<div style='background:#fff; border-left:8px solid {MAROON}; padding:20px; border-radius:15px; box-shadow:0 4px 15px rgba(0,0,0,0.08);'>
                         <p style='margin:0; font-weight:900; color:{MAROON}; font-size:1.3rem;'>{info_j['meaning'][L]}</p>
-                        <p style='font-size:1.2rem; color:{DARK_BLUE}; margin-top:10px;'>🏺 <b>{info_j['recommendation'][L]}</b></p></div>""", unsafe_allow_html=True)
+                        <p style='font-size:1.1rem; color:{DARK_BLUE}; margin-top:10px;'>🏺 <b>{info_j['recommendation'][L]}</b></p></div>""", unsafe_allow_html=True)
 
-    # DISPLAY 4: RECONCILER
+    # DISPLAY 3: RECONCILER
     st.header(T["reconciler"])
-    rec_cols = st.columns([1, 3])
     info_rec = GEOMANTIC_DATA[tuple(Reconciler)]
-    with rec_cols[0]:
-        st.markdown(render_card(Reconciler, "RECONCILER", info_rec['latin'], info_rec['hausa'], info_rec['zarma'], highlight=True), unsafe_allow_html=True)
-    with rec_cols[1]:
-        st.markdown(f"""<div style='background:white; border-left:14px solid {MAROON}; padding:35px; border-radius:20px; box-shadow:0 15px 45px rgba(0,0,0,0.12);'>
-                        <h2 style='margin:0; color:{MAROON}; border:none; font-size:2.2rem; font-weight:900;'>{info_rec['hausa']} / {info_rec['zarma']}</h2>
-                        <p style='font-size:0.9rem; color:#888; text-transform:uppercase; letter-spacing:2px;'>{info_rec['latin']}</p>
-                        <p style='font-size:1.5rem; font-weight:800; color:#1a1a1a; margin:15px 0; line-height:1.4;'>{info_rec['rec_insight'][L]}</p>
-                        <hr style='border:1px solid #eee; margin:20px 0;'>
-                        <div style='background:#fdf2f2; padding:25px; border:2px dashed {MAROON}; border-radius:15px;'>
-                            <strong style='color:{MAROON}; font-size:1.2rem; display:block; margin-bottom:8px;'>🔥 {T['rec_title']}:</strong>
-                            <span style='font-size:1.5rem; color:{DARK_BLUE}; line-height:1.5;'><b>"{info_rec['recommendation'][L]}"</b></span>
-                        </div>
-                        </div>""", unsafe_allow_html=True)
+    st.markdown(f"""<div style='background:white; border-left:14px solid {MAROON}; padding:35px; border-radius:20px; box-shadow:0 15px 45px rgba(0,0,0,0.12);'>
+                    <h2 style='margin:0; color:{MAROON}; border:none; font-size:2.2rem; font-weight:900;'>{info_rec['hausa']} / {info_rec['zarma']}</h2>
+                    <p style='font-size:0.9rem; color:#888; text-transform:uppercase; letter-spacing:2px;'>{info_rec['latin']}</p>
+                    <p style='font-size:1.5rem; font-weight:800; color:#1a1a1a; margin:15px 0; line-height:1.4;'>{info_rec['rec_insight'][L]}</p>
+                    <hr style='border:1px solid #eee; margin:20px 0;'>
+                    <div style='background:#fdf2f2; padding:25px; border:2px dashed {MAROON}; border-radius:15px;'>
+                        <strong style='color:{MAROON}; font-size:1.2rem; display:block; margin-bottom:8px;'>🔥 {T['rec_title']}:</strong>
+                        <span style='font-size:1.5rem; color:{DARK_BLUE}; line-height:1.5;'><b>"{info_rec['recommendation'][L]}"</b></span>
+                    </div>
+                    </div>""", unsafe_allow_html=True)
