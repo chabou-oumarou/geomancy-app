@@ -164,7 +164,7 @@ UI_TEXT = {
 }
 
 MAROON = "#800000"
-DARK_BLUE = "#003366"  # Professional Dark Blue for Actions
+DARK_BLUE = "#003366"
 
 # --- Functions ---
 def add_figs(f1, f2):
@@ -173,14 +173,22 @@ def add_figs(f1, f2):
 def render_card(fig, label, latin, hausa, zarma, color=MAROON, highlight=False):
     border = f"4px solid {color}" if highlight else "1px solid #edf0f2"
     shadow = f"0 15px 40px {color}33" if highlight else "0 6px 18px rgba(0,0,0,0.06)"
-    rows = "".join([f"<div style='font-size: 38px; color: {color}; line-height: 1.0; margin: 3px 0;'>{'●' if r == 1 else '●&nbsp;&nbsp;●'}</div>" for r in fig])
+    
+    # Original Circular Dots
+    rows = "".join([f"<div style='font-size: 30px; color: {color}; line-height: 0.9; margin: 2px 0;'>{'●' if r == 1 else '●&nbsp;&nbsp;●'}</div>" for r in fig])
+    
+    # Traditional Dot-Dash (Compact & Black)
+    compact_rows = "".join([f"<div style='font-size: 16px; color: black; line-height: 0.8; font-weight: bold;'>{'&bull;' if r == 1 else '&mdash;'}</div>" for r in fig])
     
     return f"""
-    <div style="background: white; border: {border}; border-radius: 18px; padding: 18px; text-align: center; box-shadow: {shadow}; margin-bottom: 12px;">
-        <div style="font-size: 0.75rem; color: #a0a0a0; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">{label}</div>
-        <div style="margin: 10px 0;">{rows}</div>
-        <div style="font-size: 1.1rem; font-weight: 900; color: #111; margin-top: 5px;">{latin}</div>
-        <div style="font-size: 0.95rem; color: {color}; font-weight: 700;">{hausa} / {zarma}</div>
+    <div style="background: white; border: {border}; border-radius: 18px; padding: 15px; text-align: center; box-shadow: {shadow}; margin-bottom: 12px; position: relative;">
+        <div style="font-size: 0.65rem; color: #a0a0a0; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">{label}</div>
+        <div style="display: flex; justify-content: center; align-items: center; gap: 15px; margin: 10px 0;">
+            <div>{rows}</div>
+            <div style="border-left: 1px solid #eee; padding-left: 12px; height: 60px; display: flex; flex-direction: column; justify-content: center;">{compact_rows}</div>
+        </div>
+        <div style="font-size: 1.0rem; font-weight: 900; color: #111; margin-top: 5px;">{latin}</div>
+        <div style="font-size: 0.85rem; color: {color}; font-weight: 700;">{hausa} / {zarma}</div>
     </div>
     """
 
@@ -240,7 +248,7 @@ if st.button(T["btn"], type="primary"):
     for i in range(8):
         info = GEOMANTIC_DATA[tuple(f_data[i])]
         f_cols[i].markdown(render_card(f_data[i], f_labels[i], info['latin'], info['hausa'], info['zarma']), unsafe_allow_html=True)
-        f_cols[i].markdown(f"<div style='font-size:0.9rem; color:{DARK_BLUE}; text-align:center; line-height:1.2;'><b>{info['recommendation'][L]}</b></div>", unsafe_allow_html=True)
+        f_cols[i].markdown(f"<div style='font-size:0.85rem; color:{DARK_BLUE}; text-align:center; line-height:1.2;'><b>{info['recommendation'][L]}</b></div>", unsafe_allow_html=True)
 
     # DISPLAY 2: NEPHEWS
     st.header(T["nephews"])
@@ -249,7 +257,7 @@ if st.button(T["btn"], type="primary"):
     for i in range(4):
         info = GEOMANTIC_DATA[tuple(N_figs[i])]
         n_cols[i].markdown(render_card(N_figs[i], n_labels[i], info['latin'], info['hausa'], info['zarma']), unsafe_allow_html=True)
-        n_cols[i].markdown(f"<div style='font-size:1.0rem; color:{DARK_BLUE}; text-align:center; line-height:1.3;'><b>{info['recommendation'][L]}</b></div>", unsafe_allow_html=True)
+        n_cols[i].markdown(f"<div style='font-size:0.95rem; color:{DARK_BLUE}; text-align:center; line-height:1.3;'><b>{info['recommendation'][L]}</b></div>", unsafe_allow_html=True)
 
     # DISPLAY 3: COURT
     st.header(T["court"])
