@@ -1,309 +1,290 @@
-# kuma_streamlit_app.py
-"""
-Application Streamlit pour utiliser la Méthode Kuma à partir d'un dictionnaire hiéroglyphique Vygus en PDF.
-
-Fonctionnalités principales
-- Upload d'un PDF (Vygus)
-- Extraction texte via pdfplumber
-- Détection automatique d'entrées hiéroglyphiques (heuristique)
-- Sélection d'un terme / hiéroglyphe
-- Affichage du signe, translittération, traduction
-- Tableau comparatif des traductions dans 10 langues subsahariennes
-- Possibilité d'ajouter / corriger manuellement les traductions et de les sauvegarder localement
-
-Limites
-- Le format exact du dictionnaire Vygus peut varier. Le parser est heuristique et peut nécessiter ajustements.
-- Les traductions automatiques nécessitent une API externe (optionnelle). Sinon, on utilise un fichier CSV local pour les traductions.
-"""
-
 import streamlit as st
-import io
-import re
-import csv
-import json
-from typing import List, Dict, Tuple, Optional
 
-# PDF extraction
-try:
-    import pdfplumber
-except Exception:
-    pdfplumber = None
+# --- 1. DATA MAP: TRILINGUAL TERMINOLOGY & SPIRITUAL ACTIONS ---
+GEOMANTIC_DATA = {
+    (1, 1, 1, 1): {
+        "latin": "Via", "hausa": "Hanya", "zarma": "Fondi",
+        "meaning": {"EN": "Change and journeys.", "FR": "Changement et voyages."},
+        "rec_insight": {"EN": "The path is open; the spirits of the road clear your way.", "FR": "Le chemin est ouvert ; les esprits de la route dégagent votre voie."},
+        "recommendation": {
+            "EN": "Pour a libation of 'Fura' (millet and milk) at a three-way crossroads.", 
+            "FR": "Versez une libation de 'Fura' (mil et lait) à un carrefour à trois voies."
+        }
+    },
+    (2, 2, 2, 2): {
+        "latin": "Populus", "hausa": "Jama'a", "zarma": "Boro-boize",
+        "meaning": {"EN": "Stability and public matters.", "FR": "Stabilité et affaires publiques."},
+        "rec_insight": {"EN": "The community and the 'Doguwa' (Earth spirit) stand behind you.", "FR": "La communauté et la 'Doguwa' (esprit de la terre) vous soutiennent."},
+        "recommendation": {
+            "EN": "Offer a white hen to a communal shrine to ensure social peace.", 
+            "FR": "Offrez une poule blanche à un autel pour assurer la paix sociale."
+        }
+    },
+    (2, 1, 1, 2): {
+        "latin": "Conjunctio", "hausa": "Gama", "zarma": "Marga",
+        "meaning": {"EN": "Union and joining together.", "FR": "Union et rapprochement."},
+        "rec_insight": {"EN": "A spiritual bond is forming; the Zima priest sees a meeting of souls.", "FR": "Un lien spirituel se forme ; le Zima voit une rencontre d'âmes."},
+        "recommendation": {
+            "EN": "Tie white and blue cloth together near a Baobab to bind this spiritual covenant.", 
+            "FR": "Liez un tissu blanc et bleu près d'un baobab pour sceller cette alliance."
+        }
+    },
+    (1, 2, 2, 1): {
+        "latin": "Carcer", "hausa": "Sarka", "zarma": "Kase",
+        "meaning": {"EN": "Restriction and delay.", "FR": "Restriction et retard."},
+        "rec_insight": {"EN": "A spiritual lock exists. You are under the heavy gaze of Mai-Giro.", "FR": "Un verrou spirituel existe. Vous êtes sous le regard de Mai-Giro."},
+        "recommendation": {
+            "EN": "Break old iron or a dry gourd at a threshold to shatter the spiritual cage.", 
+            "FR": "Brisez du vieux fer ou une calebasse à un seuil pour briser la cage spirituelle."
+        }
+    },
+    (2, 2, 1, 1): {
+        "latin": "Fortuna Major", "hausa": "Nasarawa", "zarma": "Izedu Beeri",
+        "meaning": {"EN": "Great fortune and victory.", "FR": "Grande fortune et victoire."},
+        "rec_insight": {"EN": "Sarkin Aljan (Spirit King) smiles upon this path.", "FR": "Sarkin Aljan (Le Roi des Esprits) sourit à ce chemin."},
+        "recommendation": {
+            "EN": "Sacrifice a white ram or distribute kola nuts to Bori practitioners.", 
+            "FR": "Sacrifiez un bélier blanc ou donnez des noix de cola aux adeptes du Bori."
+        }
+    },
+    (1, 1, 2, 2): {
+        "latin": "Fortuna Minor", "hausa": "Bakin Wata", "zarma": "Izedu Kaina",
+        "meaning": {"EN": "Small success and swift luck.", "FR": "Petite fortune et chance rapide."},
+        "rec_insight": {"EN": "A quick blessing from the 'Holey' spirits is arriving.", "FR": "Une bénédiction rapide des esprits 'Holey' arrive."},
+        "recommendation": {
+            "EN": "Offer dates and honeyed water to children to activate the spirits of luck.", 
+            "FR": "Offrez des dattes et de l'eau miellée aux enfants pour la chance."
+        }
+    },
+    (2, 1, 2, 1): {
+        "latin": "Acquisitio", "hausa": "Samu", "zarma": "Samu",
+        "meaning": {"EN": "Profit and gain.", "FR": "Profit et gain."},
+        "rec_insight": {"EN": "The river spirits (Harakoy) bring wealth to your bank.", "FR": "Les esprits du fleuve (Harakoy) apportent la richesse."},
+        "recommendation": {
+            "EN": "Bury seven cowrie shells in moist earth to ground the incoming wealth.", 
+            "FR": "Enterrez sept cauris dans une terre humide pour enraciner la richesse."
+        }
+    },
+    (1, 2, 1, 2): {
+        "latin": "Amissio", "hausa": "Rashi", "zarma": "Wura",
+        "meaning": {"EN": "Loss and letting go.", "FR": "Perte et lâcher-prise."},
+        "rec_insight": {"EN": "The 'bad wind' must be released. Let the current take it.", "FR": "Le 'mauvais vent' doit être libéré. Laissez le courant l'emporter."},
+        "recommendation": {
+            "EN": "Ritual bath with black soap, then throw the sponge into a stream.", 
+            "FR": "Bain rituel au savon noir, puis jetez l'éponge dans un cours d'eau."
+        }
+    },
+    (1, 2, 2, 2): {
+        "latin": "Laetitia", "hausa": "Fara'a", "zarma": "Kani-bine",
+        "meaning": {"EN": "Joy and health.", "FR": "Joie et santé."},
+        "rec_insight": {"EN": "The Goge fiddle plays for you; the spirits are dancing.", "FR": "Le violon Goge joue pour vous ; les esprits dansent."},
+        "recommendation": {
+            "EN": "Burn 'Turaren Wuta' (incense) and wear white to welcome light spirits.", 
+            "FR": "Brûlez du 'Turaren Wuta' et portez du blanc pour accueillir les esprits."
+        }
+    },
+    (2, 2, 2, 1): {
+        "latin": "Tristitia", "hausa": "Bakin Ciki", "zarma": "Bine-saray",
+        "meaning": {"EN": "Sorrow and depth.", "FR": "Tristesse et profondeur."},
+        "rec_insight": {"EN": "The deep spirits of the caves demand heavy focus.", "FR": "Les esprits des grottes exigent une grande concentration."},
+        "recommendation": {
+            "EN": "Offer charcoal at a termite mound to stabilize your foundations.", 
+            "FR": "Offrez du charbon sur une termitière pour stabiliser vos fondations."
+        }
+    },
+    (1, 2, 1, 1): {
+        "latin": "Puella", "hausa": "Yarinya", "zarma": "Way-boro",
+        "meaning": {"EN": "Harmony and grace.", "FR": "Harmonie et grâce."},
+        "rec_insight": {"EN": "The female Bori (Moussa) is present.", "FR": "Le Bori féminin (Moussa) est présent."},
+        "recommendation": {
+            "EN": "Apply henna (Lalle) to your palms and offer perfume to water.", 
+            "FR": "Appliquez du henné (Lalle) et offrez du parfum à l'eau."
+        }
+    },
+    (1, 1, 2, 1): {
+        "latin": "Puer", "hausa": "Yaro", "zarma": "Izedu-boro",
+        "meaning": {"EN": "Energy and force.", "FR": "Énergie et force."},
+        "rec_insight": {"EN": "Dongo the Thunderer provides the spark. Strike now.", "FR": "Dongo le Tonnerre fournit l'étincelle. Agissez maintenant."},
+        "recommendation": {
+            "EN": "Offer red palm oil to iron tools to harness the heat of the fire spirit.", 
+            "FR": "Versez de l'huile de palme sur des outils en fer pour l'esprit du feu."
+        }
+    },
+    (2, 2, 1, 2): {
+        "latin": "Albus", "hausa": "Fari", "zarma": "Kwaaray",
+        "meaning": {"EN": "Wisdom and peace.", "FR": "Sagesse et paix."},
+        "rec_insight": {"EN": "The 'White Spirits' (Bori Fari) bring a message of truth.", "FR": "Les 'Esprits Blancs' (Bori Fari) apportent la vérité."},
+        "recommendation": {
+            "EN": "Offer white milk and white kola to elders to invite ancestral wisdom.", 
+            "FR": "Offrez du lait et des noix de cola blanches aux anciens pour la sagesse."
+        }
+    },
+    (2, 1, 2, 2): {
+        "latin": "Rubeus", "hausa": "Ja", "zarma": "Chirey",
+        "meaning": {"EN": "Danger and passion.", "FR": "Danger et passion."},
+        "rec_insight": {"EN": "The 'Red Winds' blow. Beware of spiritual poison.", "FR": "Les 'Vents Rouges' soufflent. Attention au poison spirituel."},
+        "recommendation": {
+            "EN": "Sprinkle wood ash around your gate to neutralize the Evil Eye.", 
+            "FR": "Saupoudrez de la cendre à votre portail contre le mauvais œil."
+        }
+    },
+    (2, 1, 1, 1): {
+        "latin": "Caput Draconis", "hausa": "Kan Maciji", "zarma": "Dongo-me",
+        "meaning": {"EN": "Beginnings and entry.", "FR": "Commencements et entrée."},
+        "rec_insight": {"EN": "A new moon cycle begins. The threshold spirits are watching.", "FR": "Un nouveau cycle commence. Les esprits du seuil observent."},
+        "recommendation": {
+            "EN": "Plant a Neem seedling near your compound as a protective shield.", 
+            "FR": "Plantez un jeune Neem près de votre concession pour la protection."
+        }
+    },
+    (1, 1, 1, 2): {
+        "latin": "Cauda Draconis", "hausa": "Wutsiyar Maciji", "zarma": "Dongo-wanda",
+        "meaning": {"EN": "Endings and exit.", "FR": "Fins et sortie."},
+        "rec_insight": {"EN": "The debt is paid. The old spirits depart.", "FR": "La dette est payée. Les anciens esprits s'en vont."},
+        "recommendation": {
+            "EN": "Sweep the entrance at sunset with a local broom to banish the past.", 
+            "FR": "Balayez l'entrée au coucher du soleil pour bannir le passé."
+        }
+    }
+}
 
-# Utilities
+UI_TEXT = {
+    "EN": {
+        "title": "Maroon Oracle", "subtitle": "Hausa & Songhay Divination", "btn": "Generate Full Shield",
+        "reset": "Reset All", "foundations": "1. Foundations (Mothers & Daughters)", "nephews": "2. The Nephews",
+        "court": "3. The Court (Witnesses & Judge)", "reconciler": "4. The Reconciler",
+        "rec_title": "Spiritual Sadaka Required", "error": "Please fill all fields."
+    },
+    "FR": {
+        "title": "L'Oracle Marron", "subtitle": "Divination Haoussa & Songhaï", "btn": "Générer le Blason",
+        "reset": "Réinitialiser", "foundations": "1. Fondations (Mères & Filles)", "nephews": "2. Les Neveux",
+        "court": "3. La Cour (Témoins & Juge)", "reconciler": "4. Le Réconciliateur",
+        "rec_title": "Sadaka Spirituelle Requise", "error": "Veuillez remplir tous les champs."
+    }
+}
 
-DEFAULT_LANGUAGES = [
-    "Hausa",
-    "Zarma",
-    "Wolof",
-    "Bambara",
-    "Fula",
-    "Yoruba",
-    "Igbo",
-    "Swahili",
-    "Kinyarwanda",
-    "Lingala"
-]
+MAROON = "#800000"
+DARK_BLUE = "#003366"
 
-TRANSLATION_CSV = "kuma_translations.csv"
+# --- Functions ---
+def add_figs(f1, f2):
+    return [2 if (r1 + r2) % 2 == 0 else 1 for r1, r2 in zip(f1, f2)]
 
-st.set_page_config(page_title="Méthode Kuma — Dictionnaire Vygus", layout="wide")
-
-# Parsing heuristics
-ENTRY_REGEXES = [
-    # Heuristic: Sign glyph or code then transliteration then translation
-    # Example lines (heuristic): "G17 𓂋 r r 'mouth'  (translation: bouche)"
-    r"^(?P<sign>[\w\-\u1300-\uFFFF]+)\s+[-–]?\s*(?P<translit>[A-Za-z0-9'ˁˀ]+)\s+[-–]?\s*(?P<translation>.+)$",
-    # Another heuristic: "Sign: translit — translation"
-    r"^(?P<sign>.+?)\s*[:]\s*(?P<translit>[^—\-–]+)\s*[—\-–]\s*(?P<translation>.+)$"
-]
-
-def extract_text_from_pdf_bytes(pdf_bytes: bytes) -> str:
-    if pdfplumber is None:
-        raise RuntimeError("pdfplumber non installé. Installez-le avec pip install pdfplumber.")
-    text_pages = []
-    with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
-        for page in pdf.pages:
-            txt = page.extract_text()
-            if txt:
-                text_pages.append(txt)
-    return "\n\n".join(text_pages)
-
-def find_entries_from_text(text: str) -> List[Dict]:
+def render_card(fig, label, latin, hausa, zarma, color=MAROON, highlight=False):
+    border = f"4px solid {color}" if highlight else "1px solid #edf0f2"
+    shadow = f"0 15px 40px {color}33" if highlight else "0 6px 18px rgba(0,0,0,0.06)"
+    rows = "".join([f"<div style='font-size: 30px; color: {color}; line-height: 0.9; margin: 2px 0;'>{'●' if r == 1 else '●&nbsp;&nbsp;●'}</div>" for r in fig])
+    compact_rows = "".join([f"<div style='font-size: 16px; color: black; line-height: 0.8; font-weight: bold;'>{'&bull;' if r == 1 else '&mdash;'}</div>" for r in fig])
+    
+    return f"""
+    <div style="background: white; border: {border}; border-radius: 18px; padding: 15px; text-align: center; box-shadow: {shadow}; margin-bottom: 12px; position: relative;">
+        <div style="font-size: 0.65rem; color: #a0a0a0; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">{label}</div>
+        <div style="display: flex; justify-content: center; align-items: center; gap: 15px; margin: 10px 0;">
+            <div>{rows}</div>
+            <div style="border-left: 1px solid #eee; padding-left: 12px; height: 60px; display: flex; flex-direction: column; justify-content: center;">{compact_rows}</div>
+        </div>
+        <div style="font-size: 1.0rem; font-weight: 900; color: #111; margin-top: 5px;">{latin}</div>
+        <div style="font-size: 0.85rem; color: {color}; font-weight: 700;">{hausa} / {zarma}</div>
+    </div>
     """
-    Heuristique pour extraire des entrées du dictionnaire.
-    Retourne une liste d'objets {id, sign, translit, translation, raw}.
-    """
-    entries = []
-    lines = [ln.strip() for ln in text.splitlines() if ln.strip()]
-    id_counter = 1
-    for ln in lines:
-        matched = False
-        for rx in ENTRY_REGEXES:
-            m = re.match(rx, ln)
-            if m:
-                sign = m.groupdict().get("sign", "").strip()
-                translit = m.groupdict().get("translit", "").strip()
-                translation = m.groupdict().get("translation", "").strip()
-                entries.append({
-                    "id": str(id_counter),
-                    "sign": sign,
-                    "transliteration": translit,
-                    "translation": translation,
-                    "raw": ln
-                })
-                id_counter += 1
-                matched = True
-                break
-        if not matched:
-            # Optionally treat single-line words as possible translations lines
-            # Skip for now
-            pass
-    return entries
 
-# Translation management
+def process_input(s):
+    clean = s.replace(" ", "")
+    return (1 if len(clean) % 2 != 0 else 2) if clean else None
 
-def load_translations_csv(path: str) -> Dict[str, Dict[str, str]]:
-    """
-    CSV format expected:
-    entry_id;language;translation
-    or
-    sign;language;translation
-    """
-    data = {}
-    try:
-        with open(path, newline='', encoding='utf-8') as f:
-            reader = csv.reader(f, delimiter=';')
-            for row in reader:
-                if len(row) < 3:
-                    continue
-                key = row[0].strip()
-                lang = row[1].strip()
-                tr = row[2].strip()
-                if key not in data:
-                    data[key] = {}
-                data[key][lang] = tr
-    except FileNotFoundError:
-        # Return empty mapping if file absent
-        return {}
-    return data
+# --- UI Layout ---
+st.set_page_config(page_title="Maroon Oracle", layout="wide")
+st.markdown(f"""<style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;800;900&display=swap');
+    html, body, [data-testid="stAppViewContainer"] {{ background-color: #f8fafc; font-family: 'Outfit', sans-serif; }}
+    h1 {{ font-weight: 900; color: #1e272e !important; text-align: center; font-size: 3rem !important; }}
+    h2 {{ color: {MAROON} !important; border-bottom: 3px solid {MAROON}22; padding-bottom: 8px; margin-top: 35px; font-size: 1.8rem; font-weight: 800; }}
+    .stButton>button {{ background: {MAROON} !important; color: white !important; border-radius: 15px !important; height: 60px !important; width: 100%; font-size: 1.2rem !important; font-weight: 800 !important; }}
+    </style>""", unsafe_allow_html=True)
 
-def save_translations_csv(path: str, mapping: Dict[str, Dict[str, str]]):
-    with open(path, 'w', newline='', encoding='utf-8') as f:
-        writer = csv.writer(f, delimiter=';')
-        for key, langs in mapping.items():
-            for lang, tr in langs.items():
-                writer.writerow([key, lang, tr])
+lang_choice = st.sidebar.selectbox("🌐 Language", ["English", "Français"])
+L = "EN" if lang_choice == "English" else "FR"
+T = UI_TEXT[L]
+if st.sidebar.button(T["reset"]): st.rerun()
 
-# Optional: simple placeholder translator (no external API)
-def placeholder_translate(text: str, target_lang: str) -> str:
-    # This is a placeholder: it returns the original text prefixed by language code.
-    # Replace with real API calls if desired.
-    return f"[{target_lang}] {text}"
+st.title(T["title"])
+st.markdown(f"<p style='text-align: center; color: #666; margin-top:-20px; font-size: 1.2rem;'>{T['subtitle']}</p>", unsafe_allow_html=True)
 
-# Streamlit UI
+# INPUT SECTION
+m_cols = st.columns(4)
+mothers_input = []
+for i in range(4):
+    with m_cols[i]:
+        st.markdown(f"<div style='text-align:center; font-weight:900; font-size:1.2rem; color:#444; margin-bottom:10px;'>M{i+1}</div>", unsafe_allow_html=True)
+        m_rows = [st.text_input(f"M{i+1}L{j+1}", key=f"m{i}r{j}", label_visibility="collapsed", placeholder="••••") for j in range(4)]
+        mothers_input.append(m_rows)
 
-st.title("Méthode Kuma — Explorateur de dictionnaire Vygus")
-st.markdown("Uploadez un PDF du dictionnaire Vygus, sélectionnez une entrée et comparez les traductions dans 10 langues subsahariennes.")
+if st.button(T["btn"], type="primary"):
+    M_figs = []
+    for rows in mothers_input:
+        proc = [process_input(r) for r in rows]
+        if None in proc: st.error(T["error"]); st.stop()
+        M_figs.append(proc)
+    
+    D_figs = [[M_figs[j][i] for j in range(4)] for i in range(4)]
+    N_figs = [add_figs(M_figs[0], M_figs[1]), add_figs(M_figs[2], M_figs[3]), 
+              add_figs(D_figs[0], D_figs[1]), add_figs(D_figs[2], D_figs[3])]
+    RW = add_figs(N_figs[0], N_figs[1])
+    LW = add_figs(N_figs[2], N_figs[3])
+    Judge = add_figs(RW, LW)
+    Reconciler = add_figs(Judge, M_figs[0])
 
-with st.sidebar:
-    st.header("Paramètres")
-    uploaded_file = st.file_uploader("Upload PDF Vygus", type=["pdf"])
-    st.markdown("**Langues comparatives**")
-    langs = st.multiselect("Choisir 10 langues (ou moins)", DEFAULT_LANGUAGES, default=DEFAULT_LANGUAGES)
-    st.markdown("**Traductions**")
-    use_local_csv = st.checkbox("Charger traductions depuis fichier local kuma_translations.csv", value=True)
-    allow_auto_translate = st.checkbox("Autoriser traduction automatique placeholder", value=True)
-    if use_local_csv:
-        st.markdown("Le fichier local doit être au format CSV avec séparateur ';' : clé;langue;traduction")
-    st.markdown("---")
-    st.markdown("**Sauvegarde**")
-    save_button = st.button("Sauvegarder traductions locales maintenant")
+    # DISPLAY 1: FOUNDATIONS (Mothers & Daughters)
+    st.header(T["foundations"])
+    f_cols = st.columns(8)
+    f_labels = ["M1", "M2", "M3", "M4", "D1", "D2", "D3", "D4"]
+    f_data = M_figs + D_figs
+    for i in range(8):
+        info = GEOMANTIC_DATA[tuple(f_data[i])]
+        f_cols[i].markdown(render_card(f_data[i], f_labels[i], info['latin'], info['hausa'], info['zarma']), unsafe_allow_html=True)
+        # Action details included for foundations
+        f_cols[i].markdown(f"<div style='font-size:0.85rem; color:{DARK_BLUE}; text-align:center; line-height:1.2;'><b>{info['recommendation'][L]}</b></div>", unsafe_allow_html=True)
 
-# Load existing translations
-translations_map = {}
-if use_local_csv:
-    translations_map = load_translations_csv(TRANSLATION_CSV)
+    # DISPLAY 2: NEPHEWS
+    st.header(T["nephews"])
+    n_cols = st.columns(4)
+    n_labels = ["N1", "N2", "N3", "N4"]
+    for i in range(4):
+        info = GEOMANTIC_DATA[tuple(N_figs[i])]
+        n_cols[i].markdown(render_card(N_figs[i], n_labels[i], info['latin'], info['hausa'], info['zarma']), unsafe_allow_html=True)
+        # Action details included for nephews
+        n_cols[i].markdown(f"<div style='font-size:0.95rem; color:{DARK_BLUE}; text-align:center; line-height:1.3;'><b>{info['recommendation'][L]}</b></div>", unsafe_allow_html=True)
 
-# Process upload
-entries = []
-raw_text = ""
-if uploaded_file is not None:
-    try:
-        pdf_bytes = uploaded_file.read()
-        raw_text = extract_text_from_pdf_bytes(pdf_bytes)
-        st.success("PDF traité, extraction texte terminée.")
-        entries = find_entries_from_text(raw_text)
-        if not entries:
-            st.warning("Aucune entrée détectée automatiquement. Le parser est heuristique. Vous pouvez coller manuellement des entrées ci-dessous.")
-    except Exception as e:
-        st.error(f"Erreur lors de l'extraction du PDF : {e}")
+    # DISPLAY 3: COURT
+    st.header(T["court"])
+    c_cols = st.columns([1, 1, 2])
+    with c_cols[0]:
+        info_rw = GEOMANTIC_DATA[tuple(RW)]
+        st.markdown(render_card(RW, "RW", info_rw['latin'], info_rw['hausa'], info_rw['zarma']), unsafe_allow_html=True)
+    with c_cols[1]:
+        info_lw = GEOMANTIC_DATA[tuple(LW)]
+        st.markdown(render_card(LW, "LW", info_lw['latin'], info_lw['hausa'], info_lw['zarma']), unsafe_allow_html=True)
+    with c_cols[2]:
+        info_j = GEOMANTIC_DATA[tuple(Judge)]
+        st.markdown(render_card(Judge, "JUDGE", info_j['latin'], info_j['hausa'], info_j['zarma'], highlight=True), unsafe_allow_html=True)
+        st.markdown(f"""<div style='background:#fff; border-left:8px solid {MAROON}; padding:20px; border-radius:15px; box-shadow:0 4px 15px rgba(0,0,0,0.08);'>
+                        <p style='margin:0; font-weight:900; color:{MAROON}; font-size:1.3rem;'>{info_j['meaning'][L]}</p>
+                        <p style='font-size:1.2rem; color:{DARK_BLUE}; margin-top:10px;'>🏺 <b>{info_j['recommendation'][L]}</b></p></div>""", unsafe_allow_html=True)
 
-# Manual paste fallback
-st.subheader("Aperçu du texte extrait")
-if raw_text:
-    st.text_area("Texte extrait (aperçu)", raw_text[:5000], height=200)
-else:
-    st.info("Aucun PDF chargé ou extraction vide. Vous pouvez coller ici un extrait du dictionnaire pour le parser.")
-    manual_text = st.text_area("Coller un extrait du dictionnaire ici", height=200)
-    if manual_text:
-        raw_text = manual_text
-        entries = find_entries_from_text(raw_text)
-        if entries:
-            st.success(f"{len(entries)} entrées détectées dans le texte collé.")
-        else:
-            st.warning("Aucune entrée détectée dans le texte collé.")
-
-# Show entries list and selection
-st.subheader("Entrées détectées")
-if entries:
-    options = [f"{e['id']} — {e['sign']} — {e['transliteration']} — {e['translation']}" for e in entries]
-    choice = st.selectbox("Sélectionner une entrée", options)
-    selected_id = choice.split(" — ")[0]
-    selected_entry = next((e for e in entries if e['id'] == selected_id), None)
-else:
-    st.info("Aucune entrée détectée. Vous pouvez créer une entrée manuellement.")
-    if st.button("Créer une entrée manuelle"):
-        # Provide fields
-        new_sign = st.text_input("Signe hiéroglyphique")
-        new_translit = st.text_input("Translittération")
-        new_translation = st.text_input("Traduction en français")
-        if new_sign and new_translit:
-            nid = str(len(entries) + 1)
-            new_entry = {"id": nid, "sign": new_sign, "transliteration": new_translit, "translation": new_translation, "raw": ""}
-            entries.append(new_entry)
-            st.success("Entrée ajoutée. Sélectionnez-la dans la liste.")
-    selected_entry = None
-
-# Display selected entry details
-if selected_entry:
-    st.markdown("### Détails de l'entrée sélectionnée")
-    col1, col2 = st.columns([1, 2])
-    with col1:
-        st.markdown("**Signe**")
-        st.code(selected_entry["sign"])
-        st.markdown("**ID**")
-        st.write(selected_entry["id"])
-    with col2:
-        st.markdown("**Translittération**")
-        st.write(selected_entry["transliteration"])
-        st.markdown("**Traduction française**")
-        st.write(selected_entry["translation"])
-
-    st.markdown("**Texte source brut**")
-    st.write(selected_entry.get("raw", ""))
-
-    # Comparative table
-    st.markdown("### Tableau comparatif des traductions")
-    if not langs:
-        st.warning("Sélectionnez au moins une langue dans la barre latérale.")
-    else:
-        # Build table data
-        key = selected_entry["id"]  # use id as key for translations_map
-        row = {"Signe": selected_entry["sign"], "Translittération": selected_entry["transliteration"], "Français": selected_entry["translation"]}
-        # For each language, get translation from map or placeholder
-        lang_translations = {}
-        for L in langs:
-            tr = ""
-            if key in translations_map and L in translations_map[key]:
-                tr = translations_map[key][L]
-            else:
-                if allow_auto_translate:
-                    tr = placeholder_translate(selected_entry["translation"] or selected_entry["transliteration"], L)
-                else:
-                    tr = ""
-            lang_translations[L] = tr
-
-        # Display as two-column table: attribute and translations
-        # We'll render a simple table
-        table_cols = ["Attribut"] + langs
-        # Build rows
-        attribs = ["Signe", "Translittération", "Traduction française"]
-        table_rows = []
-        for a in attribs:
-            row_vals = [a]
-            for L in langs:
-                if a == "Signe":
-                    row_vals.append(selected_entry["sign"])
-                elif a == "Translittération":
-                    row_vals.append(selected_entry["transliteration"])
-                else:
-                    row_vals.append(lang_translations.get(L, ""))
-            table_rows.append(row_vals)
-
-        # Render table using st.table
-        import pandas as pd
-        df = pd.DataFrame(table_rows, columns=table_cols)
-        st.table(df)
-
-        # Allow manual edits for each language
-        st.markdown("#### Édition manuelle des traductions")
-        edited = False
-        if key not in translations_map:
-            translations_map[key] = {}
-        for L in langs:
-            current = translations_map.get(key, {}).get(L, lang_translations.get(L, ""))
-            new_val = st.text_input(f"Traduction en {L}", value=current, key=f"{key}_{L}")
-            if new_val != current:
-                translations_map[key][L] = new_val
-                edited = True
-
-        if edited:
-            st.success("Modifications enregistrées en mémoire locale (pensez à sauvegarder sur disque).")
-
-# Save translations button
-if save_button:
-    try:
-        save_translations_csv(TRANSLATION_CSV, translations_map)
-        st.success(f"Traductions sauvegardées dans {TRANSLATION_CSV}")
-    except Exception as e:
-        st.error(f"Erreur lors de la sauvegarde : {e}")
-
-st.markdown("---")
-st.markdown("**Notes techniques**")
-st.markdown(
-    "- Le parser est heuristique. Si le dictionnaire Vygus a une structure particulière (colonnes, tableaux, images), il faudra adapter la logique d'extraction.\n"
-    "- Pour des traductions automatiques réelles, remplacez `placeholder_translate` par un appel à une API (LibreTranslate, Google Translate, etc.) en respectant les clés et quotas.\n"
-    "- Le fichier `kuma_translations.csv` est utilisé pour stocker les traductions manuelles. Format : clé;langue;traduction."
-)
-
-st.markdown("Fin de l'application. Pour toute adaptation (extraction d'images hiéroglyphiques, parsing avancé, intégration d'API de traduction), je peux fournir une version améliorée sur demande.")
+    # DISPLAY 4: RECONCILER
+    st.header(T["reconciler"])
+    rec_cols = st.columns([1, 3])
+    info_rec = GEOMANTIC_DATA[tuple(Reconciler)]
+    with rec_cols[0]:
+        st.markdown(render_card(Reconciler, "RECONCILER", info_rec['latin'], info_rec['hausa'], info_rec['zarma'], highlight=True), unsafe_allow_html=True)
+    with rec_cols[1]:
+        st.markdown(f"""<div style='background:white; border-left:14px solid {MAROON}; padding:35px; border-radius:20px; box-shadow:0 15px 45px rgba(0,0,0,0.12);'>
+                        <h2 style='margin:0; color:{MAROON}; border:none; font-size:2.2rem; font-weight:900;'>{info_rec['hausa']} / {info_rec['zarma']}</h2>
+                        <p style='font-size:0.9rem; color:#888; text-transform:uppercase; letter-spacing:2px;'>{info_rec['latin']}</p>
+                        <p style='font-size:1.5rem; font-weight:800; color:#1a1a1a; margin:15px 0; line-height:1.4;'>{info_rec['rec_insight'][L]}</p>
+                        <hr style='border:1px solid #eee; margin:20px 0;'>
+                        <div style='background:#fdf2f2; padding:25px; border:2px dashed {MAROON}; border-radius:15px;'>
+                            <strong style='color:{MAROON}; font-size:1.2rem; display:block; margin-bottom:8px;'>🔥 {T['rec_title']}:</strong>
+                            <span style='font-size:1.5rem; color:{DARK_BLUE}; line-height:1.5;'><b>"{info_rec['recommendation'][L]}"</b></span>
+                        </div>
+                        </div>""", unsafe_allow_html=True)
